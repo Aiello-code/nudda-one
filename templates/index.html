@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trump Tracker</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 3rem;
+            color: red;
+            text-shadow: 2px 2px 5px yellow;
+        }
+        p {
+            font-size: 1.5rem;
+        }
+        img {
+            width: 300px;
+            border: 5px solid white;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚨 TRUMP MENTIONS ALERT 🚨</h1>
+    <p>Trump is on the front page of the SMH <strong>{{ mention_count }}</strong> times right now!</p>
+    <img src="{{ url_for('static', filename='trump.jpg') }}" alt="Donald Trump">
+</body>
+</html>
