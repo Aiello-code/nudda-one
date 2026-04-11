@@ -25,11 +25,29 @@
             border-radius: 10px;
             margin-top: 20px;
         }
+        .nav {
+            margin-top: 40px;
+        }
+        .nav a {
+            color: #FFD700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            border: 2px solid #FFD700;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+        .nav a:hover {
+            background: #FFD700;
+            color: black;
+        }
     </style>
 </head>
 <body>
     <h1>🚨 TRUMP MENTIONS ALERT 🚨</h1>
     <p>Trump is on the front page of the SMH <strong>{{ mention_count }}</strong> times right now!</p>
     <img src="{{ url_for('static', filename='trump.jpg') }}" alt="Donald Trump">
+    <div class="nav">
+        <a href="/property">🏠 Is it a good time to buy in Sydney? →</a>
+    </div>
 </body>
 </html>

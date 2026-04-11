@@ -20,8 +20,11 @@ def count_trump_mentions():
 @app.route("/")
 def index():
     mention_count = count_trump_mentions()
-
     return render_template("index.html", mention_count=mention_count)
+
+@app.route("/property")
+def property_check():
+    return render_template("property.html")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
