@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heartstring</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#E8E0D4;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:24px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.phone{width:375px;min-height:760px;background:#FBF6EF;border-radius:40px;overflow:hidden;display:flex;flex-direction:column;border:0.5px solid rgba(0,0,0,0.18);position:relative;margin:0 auto}
+.status{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 6px;font-size:12px;font-weight:600;color:#1A1208;flex-shrink:0}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.content::-webkit-scrollbar{width:0}
+.tab-bar{height:80px;background:#FFF;border-top:0.5px solid rgba(0,0,0,0.1);display:flex;align-items:flex-start;justify-content:space-around;padding:10px 8px 0;flex-shrink:0}
+.tab-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 12px;border-radius:14px;min-width:64px}
+.tab-icon{font-size:20px;line-height:1}.tab-lbl{font-size:10px;font-weight:500;color:#9B8B78}.tab-item.active .tab-lbl{color:#C96A30}
+.screen{display:none}.screen.active{display:block}
+.ph{padding:18px 20px 10px;background:#FBF6EF;position:sticky;top:0;z-index:10}
+.ptitle{font-size:26px;font-weight:700;color:#1A1208;font-family:Georgia,serif;letter-spacing:-0.5px}
+.psub{font-size:12px;color:#9B8B78;margin-top:2px}
+.slbl{font-size:10px;font-weight:700;color:#9B8B78;letter-spacing:0.8px;text-transform:uppercase;padding:14px 20px 6px}
+.card{background:#FFF;border-radius:16px;border:0.5px solid rgba(0,0,0,0.07);margin:6px 20px;padding:15px}
+.streak-card{background:#C96A30;border-radius:22px;margin:6px 20px;padding:18px}
+.snum{font-size:50px;font-weight:700;color:#FFF;font-family:Georgia,serif;line-height:1}
+.pbar{height:5px;background:rgba(255,255,255,0.25);border-radius:3px;margin-top:12px}
+.pfill{height:100%;background:#FFF;border-radius:3px;transition:width 0.4s}
+.rem-card{background:#FFF;border-radius:12px;border-left:3px solid #C96A30;border-top:0.5px solid rgba(0,0,0,0.06);border-right:0.5px solid rgba(0,0,0,0.06);border-bottom:0.5px solid rgba(0,0,0,0.06);margin:5px 20px;padding:11px 13px}
+.act-row{display:flex;gap:8px;margin:6px 20px}
+.act-btn{flex:1;background:#FFF;border-radius:14px;border:0.5px solid rgba(0,0,0,0.08);padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.act-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.act-lbl{font-size:10px;font-weight:600;color:#6B5B45;text-align:center}
+.person-card{background:#FFF;border-radius:16px;border:0.5px solid rgba(0,0,0,0.07);margin:5px 20px;padding:13px;display:flex;align-items:center;gap:11px;cursor:pointer}
+.av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:Georgia,serif;flex-shrink:0}
+.av-1{background:#FAEEDA;color:#854F0B}.av-2{background:#E6F1FB;color:#185FA5}.av-3{background:#EAF3DE;color:#3B6D11}
+.pname{font-size:14px;font-weight:600;color:#1A1208}.prel{font-size:11px;color:#9B8B78;margin-top:1px}
+.echip{background:#FAEEDA;color:#854F0B;font-size:10px;font-weight:600;padding:4px 8px;border-radius:8px;text-align:center;flex-shrink:0;line-height:1.5}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 20px}
+.stat-card{background:#FFF;border-radius:14px;border:0.5px solid rgba(0,0,0,0.07);padding:13px}
+.stat-n{font-size:26px;font-weight:700;color:#C96A30;font-family:Georgia,serif}.stat-l{font-size:10px;color:#9B8B78;margin-bottom:3px}
+.dh{background:#FFF;padding:14px 18px;border-bottom:0.5px solid rgba(0,0,0,0.07);display:flex;align-items:center;gap:11px;position:sticky;top:0;z-index:10;flex-shrink:0}
+.bk{width:32px;height:32px;border-radius:50%;background:#F1EFE8;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;color:#1A1208}
+.dav{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;font-family:Georgia,serif}
+.dnm{font-size:19px;font-weight:700;color:#1A1208;font-family:Georgia,serif}.rbadge{display:inline-block;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#FAEEDA;color:#854F0B;margin-top:3px}
+.fr{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,0.05)}.fr:last-child{border-bottom:none}
+.fk{font-size:11px;color:#9B8B78}.fv{font-size:12px;color:#1A1208;font-weight:500;text-align:right;max-width:190px;line-height:1.4}
+.ni{padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,0.06)}.ni:last-child{border-bottom:none}
+.nd{font-size:9px;color:#9B8B78;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}.nt{font-size:12px;color:#1A1208;line-height:1.5}
+.gi{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,0.06)}.gi:last-child{border-bottom:none}
+.gdot{width:7px;height:7px;border-radius:50%;background:#C96A30;flex-shrink:0}
+.qscore{display:flex;justify-content:space-between;align-items:center;margin:8px 20px;background:#FAEEDA;border-radius:14px;padding:11px 15px}
+.qsv{font-size:20px;font-weight:700;color:#C96A30;font-family:Georgia,serif}.qsl{font-size:10px;color:#854F0B;margin-bottom:1px}
+.qcard{background:#FFF;border-radius:20px;border:0.5px solid rgba(0,0,0,0.07);margin:8px 20px;padding:18px}
+.qq{font-size:16px;font-weight:600;color:#1A1208;line-height:1.4;font-family:Georgia,serif;margin-bottom:16px}
+.qopt{width:100%;background:#FBF6EF;border:0.5px solid rgba(0,0,0,0.08);border-radius:12px;padding:12px 14px;margin-bottom:8px;text-align:left;font-size:13px;color:#1A1208;cursor:pointer;font-family:inherit;display:block}
+.qopt.correct{background:#EAF3DE;border-color:#639922;color:#27500A}.qopt.wrong{background:#FCEBEB;border-color:#E24B4A;color:#501313}
+.daily-card{background:#C96A30;border-radius:20px;margin:6px 20px;padding:18px}
+.dlbl{font-size:9px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:7px}
+.dqt{font-size:14px;color:#FFF;line-height:1.55;font-family:Georgia,serif}
+.badge-row{display:flex;gap:7px;flex-wrap:wrap;padding:0 20px 8px}
+.badge{background:#FBF6EF;border:0.5px solid rgba(201,106,48,0.3);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:600;color:#C96A30}
+.vbtn{width:76px;height:76px;border-radius:50%;background:#C96A30;border:none;cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;margin:0 auto;-webkit-user-select:none;user-select:none}
+.wbar{width:3px;background:#C96A30;border-radius:2px;height:8px;transition:height 0.1s}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#1A1208;color:#FFF;border-radius:12px;padding:12px 20px;font-size:13px;font-weight:500;z-index:200;text-align:center;opacity:0;transition:opacity 0.25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.e10-item{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:0.5px solid rgba(0,0,0,0.05)}.e10-item:last-child{border-bottom:none}
+.e10-num{width:19px;height:19px;border-radius:50%;background:#FAEEDA;color:#854F0B;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+</style>
+</head>
+<body>
+<div class='phone'>
+  <div class='status'><span id='clk'>9:41</span><span style='font-size:11px'>&#9679;&#9679;&#9679; WiFi</span></div>
+  <div class='content screen active' id='screen-home'>
+    <div class='ph'><div class='ptitle'>Good morning, Alex</div><div class='psub'>3 people in your circle</div></div>
+    <div class='streak-card'>
+      <div style='display:flex;justify-content:space-between;align-items:flex-start'>
+        <div>
+          <div style='font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:3px'>&#128293; Current streak</div>
+          <div class='snum' id='streak-num'>7</div>
+          <div style='font-size:11px;color:rgba(255,255,255,0.75)'>days in a row</div>
+          <div style='font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px' id='pts-line'>340 pts &middot; Thoughtful Friend</div>
+        </div>
+        <div style='text-align:right'>
+          <div style='font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:4px' id='level-lbl'>LEVEL 3</div>
+          <div style='font-size:26px'>&#127919;</div>
+        </div>
+      </div>
+      <div class='pbar'><div class='pfill' id='pts-bar' style='width:70%'></div></div>
+      <div style='display:flex;justify-content:space-between;margin-top:5px'>
+        <div style='font-size:9px;color:rgba(255,255,255,0.6)' id='pts-prog'>340 / 500 pts to Level 4</div>
+        <div style='font-size:9px;color:rgba(255,255,255,0.6)' id='pts-pct'>70%</div>
+      </div>
+    </div>
+    <div class='slbl'>Upcoming events</div>
+    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Emma&#39;s Anniversary &middot; June 12</div><div style='font-size:11px;color:#9B8B78;margin-top:2px'>61 days away &middot; Time to plan a gift</div></div>
+    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Jamie&#39;s Birthday &middot; July 22</div><div style='font-size:11px;color:#9B8B78;margin-top:2px'>101 days away &middot; 3 gift ideas ready</div></div>
+    <div class='slbl'>Quick actions</div>
+    <div class='act-row'>
+      <div class='act-btn' onclick="showScreen('addnote')"><div class='act-icon' style='background:#FAEEDA'>&#9999;&#65039;</div><div class='act-lbl'>Add Note</div></div>
+      <div class='act-btn' onclick="showScreen('voice')"><div class='act-icon' style='background:#FAECE7'>&#127897;&#65039;</div><div class='act-lbl'>Voice Note</div></div>
+      <div class='act-btn' onclick="showScreen('quiz');initQuiz()"><div class='act-icon' style='background:#EAF3DE'>&#129504;</div><div class='act-lbl'>Quiz Me</div></div>
+      <div class='act-btn' onclick="showScreen('insights')"><div class='act-icon' style='background:#E6F1FB'>&#128161;</div><div class='act-lbl'>Insights</div></div>
+    </div>
+    <div class='slbl'>Today&#39;s check-in</div>
+    <div class='card'>
+      <div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:7px'>ABOUT EMMA</div>
+      <div style='font-size:14px;color:#1A1208;line-height:1.55;font-family:Georgia,serif'>&#8220;Emma mentioned feeling overwhelmed at work last Tuesday. Have you checked in with her since then?&#8221;</div>
+      <div style='margin-top:12px;display:flex;gap:7px' id='checkin-btns'>
+        <button onclick='checkIn(this)' style='flex:1;background:#EAF3DE;border:none;border-radius:9px;padding:9px;font-size:12px;color:#3B6D11;cursor:pointer;font-family:inherit;font-weight:600'>Yes, I did &#10003;</button>
+        <button onclick='remindLater(this)' style='flex:1;background:#FBF6EF;border:0.5px solid rgba(0,0,0,0.1);border-radius:9px;padding:9px;font-size:12px;color:#6B5B45;cursor:pointer;font-family:inherit'>Remind me later</button>
+      </div>
+    </div>
+    <div class='slbl'>Your badges</div>
+    <div class='badge-row' id='badge-row'></div>
+    <div style='height:20px'></div>
+  </div>
+  <div class='content screen' id='screen-people'>
+    <div class='ph'><div class='ptitle'>Your Circle</div><div class='psub'>3 of 3 people added</div></div>
+    <div class='slbl'>Relationships</div>
+    <div class='person-card' onclick="showPerson(0)"><div class='av av-1'>EM</div><div style='flex:1'><div class='pname'>Emma</div><div class='prel' id='pc-0-sub'>Partner &middot; 12 notes</div></div><div class='echip'>Anniversary<br>61 days</div></div>
+    <div class='person-card' onclick="showPerson(1)"><div class='av av-2'>DA</div><div style='flex:1'><div class='pname'>Dad</div><div class='prel' id='pc-1-sub'>Parent &middot; 7 notes</div></div><div class='echip'>Birthday<br>205 days</div></div>
+    <div class='person-card' onclick="showPerson(2)"><div class='av av-3'>JA</div><div style='flex:1'><div class='pname'>Jamie</div><div class='prel' id='pc-2-sub'>Best Friend &middot; 8 notes</div></div><div class='echip'>Birthday<br>101 days</div></div>
+    <div class='slbl'>Stats</div>
+    <div class='stat-grid'>
+      <div class='stat-card'><div class='stat-l'>Total notes</div><div class='stat-n' id='stat-notes'>27</div></div>
+      <div class='stat-card'><div class='stat-l'>Quiz accuracy</div><div class='stat-n' id='stat-quiz'>&#8212;</div></div>
+      <div class='stat-card'><div class='stat-l'>Events tracked</div><div class='stat-n'>6</div></div>
+      <div class='stat-card'><div class='stat-l'>Gift ideas</div><div class='stat-n'>9</div></div>
+    </div>
+    <div style='height:20px'></div>
+  </div>
+  <div class='content screen' id='screen-detail' style='padding-bottom:20px'>
+    <div class='dh'><div class='bk' onclick="showScreen('people')">&#8592;</div><div class='dav' id='d-av' style='background:#FAEEDA;color:#854F0B'>EM</div><div><div class='dnm' id='d-nm'>Emma</div><div class='rbadge' id='d-rl'>Partner</div></div></div>
+    <div class='slbl'>Profile</div><div class='card' id='d-facts'></div>
+    <div class='slbl'>Upcoming events</div><div id='d-events'></div>
+    <div class='slbl'>Gift ideas</div><div class='card' id='d-gifts'></div>
+    <div class='slbl'>Notes</div><div class='card' id='d-notes'></div>
+    <div style='margin:10px 20px'><button onclick="showScreen('quiz');filterQuiz(currentPerson);initQuiz()" style='width:100%;background:#C96A30;color:#FFF;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit'>&#129504; Quiz me on this person</button></div>
+  </div>
+  <div class='content screen' id='screen-quiz' style='padding-bottom:20px'>
+    <div class='ph'><div class='ptitle'>Memory Quiz</div><div class='psub'>How well do you really know them?</div></div>
+    <div class='qscore'><div><div class='qsl'>Score</div><div class='qsv' id='q-score'>0 / 0</div></div><div style='text-align:right'><div class='qsl'>Points earned</div><div class='qsv' id='q-bonus'>+0 pts</div></div></div>
+    <div class='qcard' id='q-card'>
+      <div style='font-size:11px;color:#9B8B78;font-weight:700;margin-bottom:4px' id='q-about'>ABOUT EMMA</div>
+      <div style='font-size:11px;color:#C96A30;font-weight:600;margin-bottom:10px' id='q-ctr'>Question 1 of 7</div>
+      <div class='qq' id='q-text'>Loading...</div>
+      <div id='q-opts'></div>
+      <div id='q-fb' style='display:none;padding:10px;border-radius:9px;margin-top:8px;font-size:12px;line-height:1.5'></div>
+      <button id='q-next' style='display:none;width:100%;background:#C96A30;color:#FFF;border:none;border-radius:11px;padding:11px;margin-top:8px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600' onclick='nextQ()'>Next &#8594;</button>
+    </div>
+    <div id='q-done' style='display:none'>
+      <div class='card' style='text-align:center;padding:26px'>
+        <div style='font-size:38px;margin-bottom:8px'>&#127881;</div>
+        <div style='font-size:19px;font-weight:700;color:#1A1208;font-family:Georgia,serif;margin-bottom:4px'>Quiz complete!</div>
+        <div style='font-size:13px;color:#9B8B78;margin-bottom:14px' id='q-res'>You scored 0 / 7</div>
+        <div style='background:#FAEEDA;border-radius:11px;padding:13px;margin-bottom:14px'><div style='font-size:22px;font-weight:700;color:#C96A30;font-family:Georgia,serif' id='q-pts'>+0 pts</div><div style='font-size:11px;color:#854F0B'>added to your total</div></div>
+        <button onclick='initQuiz()' style='width:100%;background:#C96A30;color:#FFF;border:none;border-radius:12px;padding:12px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600'>Try again</button>
+      </div>
+    </div>
+  </div>
+  <div class='content screen' id='screen-insights' style='padding-bottom:20px'>
+    <div class='ph'><div class='ptitle'>Insights</div><div class='psub'>Daily reflections &amp; prompts</div></div>
+    <div class='slbl'>Today&#39;s reflection</div>
+    <div class='daily-card'><div class='dlbl'>About Emma</div><div class='dqt'>&#8220;Emma&#39;s been overwhelmed lately. What&#39;s one small thing you could do today to make her feel more supported?&#8221;</div></div>
+    <div class='slbl'>Suggested questions to ask</div>
+    <div class='card'><div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:9px'>FOR EMMA</div><div style='font-size:12px;color:#1A1208;line-height:2.1'>&bull; How has work been since the new deadline?<br>&bull; What&#39;s one thing that made you smile this week?<br>&bull; Have you thought more about the Japan trip?<br>&bull; Is there anything I can help with this weekend?</div></div>
+    <div class='card'><div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:9px'>FOR DAD</div><div style='font-size:12px;color:#1A1208;line-height:2.1'>&bull; How&#39;s the knee feeling after physio?<br>&bull; Did you finish this week&#39;s crossword?<br>&bull; Want to book a round of golf this month?</div></div>
+    <div class='card'><div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:9px'>FOR JAMIE</div><div style='font-size:12px;color:#1A1208;line-height:2.1'>&bull; How&#39;s marathon training going?<br>&bull; Any board game nights coming up?<br>&bull; What&#39;s the latest on the promotion?</div></div>
+    <div class='slbl'>The Essential 10</div><div class='card' id='e10'></div>
+  </div>
+  <div class='content screen' id='screen-addnote' style='padding-bottom:20px'>
+    <div class='dh'><div class='bk' onclick="showScreen('home')">&#8592;</div><div style='font-size:15px;font-weight:600;color:#1A1208'>Quick Note</div></div>
+    <div style='padding:14px 20px'>
+      <select id='note-who' style='width:100%;background:#FFF;border:0.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:9px 12px;font-size:13px;color:#1A1208;outline:none;margin-bottom:10px'>
+        <option value='0'>About Emma</option><option value='1'>About Dad</option><option value='2'>About Jamie</option>
+      </select>
+      <textarea id='note-txt' style='width:100%;background:#FFF;border:0.5px solid rgba(0,0,0,0.12);border-radius:13px;padding:13px;font-size:13px;color:#1A1208;resize:none;min-height:120px;outline:none' placeholder='What do you want to remember?' rows='5'></textarea>
+      <div style='font-size:11px;color:#9B8B78;margin:10px 0 7px;font-weight:600'>QUICK PROMPTS</div>
+      <div style='display:flex;gap:6px;flex-wrap:wrap' id='chips'></div>
+      <button onclick='saveNote()' style='width:100%;background:#C96A30;color:#FFF;border:none;border-radius:13px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:14px'>Save note +5 pts</button>
+    </div>
+  </div>
+  <div class='content screen' id='screen-voice'>
+    <div class='dh'><div class='bk' onclick="showScreen('home');stopVoice()">&#8592;</div><div style='font-size:15px;font-weight:600;color:#1A1208'>Voice Note</div></div>
+    <div style='padding:30px 20px;text-align:center'>
+      <div style='font-size:12px;color:#9B8B78;margin-bottom:7px'>Recording for</div>
+      <select style='background:#FAEEDA;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;color:#854F0B;font-family:inherit;outline:none;margin-bottom:30px'><option>Emma</option><option>Dad</option><option>Jamie</option></select>
+      <div style='height:56px;display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:28px' id='waveform'>
+        <div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div>
+      </div>
+      <button class='vbtn' id='vbtn' onmousedown='startVoice()' onmouseup='stopVoice()' ontouchstart='startVoice(event)' ontouchend='stopVoice()'>&#127897;&#65039;</button>
+      <div style='font-size:28px;font-weight:700;color:#C96A30;font-family:Georgia,serif;margin:18px 0 6px' id='vtimer'>0:00</div>
+      <div style='font-size:12px;color:#9B8B78' id='vlbl'>Hold the button to record</div>
+      <div style='margin-top:28px;background:#FBF6EF;border-radius:14px;padding:14px;text-align:left'>
+        <div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:6px'>RECENT VOICE NOTES</div>
+        <div style='font-size:12px;color:#1A1208;line-height:1.8'>&#128206; Emma &middot; 0:23 &middot; 10 Apr<br>&#128206; Jamie &middot; 0:41 &middot; 8 Apr<br>&#128206; Dad &middot; 1:02 &middot; 5 Apr</div>
+      </div>
+    </div>
+  </div>
+  <div class='toast' id='toast'></div>
+  <div class='tab-bar'>
+    <div class='tab-item active' id='tab-home' onclick="showScreen('home')"><div class='tab-icon'>&#127968;</div><div class='tab-lbl'>Home</div></div>
+    <div class='tab-item' id='tab-people' onclick="showScreen('people');refreshPeopleScreen()"><div class='tab-icon'>&#128101;</div><div class='tab-lbl'>Circle</div></div>
+    <div class='tab-item' id='tab-quiz' onclick="showScreen('quiz');initQuiz()"><div class='tab-icon'>&#129504;</div><div class='tab-lbl'>Quiz</div></div>
+    <div class='tab-item' id='tab-insights' onclick="showScreen('insights')"><div class='tab-icon'>&#128161;</div><div class='tab-lbl'>Insights</div></div>
+  </div>
+</div>
+<a href='/' style='display:block;text-align:center;padding:16px;color:#9B8B78;font-size:12px;text-decoration:none'>&larr; Back to jamespelosi.com</a>
+<script>
+const people=[
+  {name:'Emma',rel:'Partner',initials:'EM',avc:'av-1',bday:'15 March 1992',ann:'12 June 2019',job:'Graphic Designer',loves:'Sushi, hiking, true crime podcasts',dislikes:'Loud restaurants, surprises',events:[{name:'Anniversary',date:'June 12, 2026',days:61}],gifts:['Pottery class for two','Japan travel guidebook','Noise-cancelling headphones'],defaultNotes:[{date:'10 Apr 2026',text:'Mentioned feeling overwhelmed at work — big project deadline approaching'},{date:'5 Apr 2026',text:'Really enjoyed the Thai restaurant on King St, wants to return'},{date:'28 Mar 2026',text:'Dreams of visiting Japan next year — planning has started'}]},
+  {name:'Dad',rel:'Parent',initials:'DA',avc:'av-2',bday:'3 November 1958',ann:null,job:'Retired electrician',loves:'Golf, crosswords, 60s music',dislikes:'Spicy food, technology',events:[{name:'Birthday',date:'Nov 3, 2026',days:205}],gifts:['Golf lesson voucher','Times crossword collection','Beatles vinyl record'],defaultNotes:[{date:'8 Apr 2026',text:'Knee bothering him again — physio next week'},{date:'15 Mar 2026',text:'Proud of completing the crossword 3 days running'}]},
+  {name:'Jamie',rel:'Best Friend',initials:'JA',avc:'av-3',bday:'22 July 1991',ann:null,job:'Software engineer',loves:'Board games, specialty coffee, cycling',dislikes:'Crowds, slow Wi-Fi',events:[{name:'Birthday',date:'Jul 22, 2026',days:101}],gifts:['Running shoes gift card','Board game expansion pack','Coffee subscription box'],defaultNotes:[{date:'11 Apr 2026',text:'Just started marathon training — first big race'},{date:'1 Apr 2026',text:'Stressed about work promotion, reviewed in May'}]}
+];
+const allQs=[
+  {pi:0,q:"What is Emma's current job?",opts:['Nurse','Graphic Designer','Teacher','Lawyer'],ans:1},
+  {pi:0,q:'What cuisine did Emma recently enjoy?',opts:['Italian','Japanese','Thai','Mexican'],ans:2},
+  {pi:0,q:"What is Emma's dream travel destination?",opts:['Italy','Japan','New Zealand','Iceland'],ans:1},
+  {pi:1,q:'What hobby does Dad love most?',opts:['Tennis','Golf','Fishing','Chess'],ans:1},
+  {pi:1,q:'What music era does Dad enjoy?',opts:['80s','70s','60s','50s'],ans:2},
+  {pi:2,q:'What is Jamie currently training for?',opts:['Triathlon','Swim meet','Marathon','Cycling race'],ans:2},
+  {pi:2,q:'What does Jamie love doing in free time?',opts:['Video games','Board games','Hiking','Cooking'],ans:1}
+];
+const e10=['Birthday and how they like to celebrate','Their biggest current worry or stressor','Their love language (gifts, words, quality time…)','Favourite food or restaurant','Main hobby or passion','Most important relationship in their life','Something they are currently working toward','A fond memory you share together','How they prefer to be supported when struggling','One thing that always makes them smile'];
+const chips=['Enjoyed a meal','Health update','Upcoming plan','Mood / feeling','Said something funny','Shared a memory'];
+const LS={
+  DEFAULTS:{points:340,streak:{count:7,lastDate:null},notes:[[],[],[]],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
+  get(k){const r=localStorage.getItem('hs_'+k);return r!==null?JSON.parse(r):this.DEFAULTS[k];},
+  set(k,v){localStorage.setItem('hs_'+k,JSON.stringify(v));},
+  getPoints(){return this.get('points');},
+  addPoints(n){const p=this.getPoints()+n;this.set('points',p);return p;},
+  getStreak(){return this.get('streak');},
+  touchStreak(){const today=new Date().toDateString();const s=this.getStreak();if(s.lastDate===today)return s;const yest=new Date(Date.now()-86400000).toDateString();s.count=(s.lastDate===yest)?s.count+1:1;s.lastDate=today;this.set('streak',s);return s;},
+  getNotes(){return this.get('notes');},
+  addNote(pi,text){const notes=this.getNotes();const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];notes[pi].unshift({date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text});this.set('notes',notes);return notes;},
+  getBadges(){return this.get('badges');},
+  addBadge(b){const badges=this.getBadges();if(!badges.includes(b)){badges.push(b);this.set('badges',badges);}return badges;},
+  getCheckin(){return this.get('checkin');},
+  setCheckin(){this.set('checkin',{date:new Date().toDateString(),done:true});},
+  getQuiz(){return this.get('quiz');},
+  addQuizResult(c,t){const q=this.getQuiz();q.total+=t;q.correct+=c;this.set('quiz',q);return q;}
+};
+const LEVELS=[{min:0,max:99,level:1,title:"Getting Started",next:100},{min:100,max:249,level:2,title:"Caring Friend",next:250},{min:250,max:499,level:3,title:"Thoughtful Friend",next:500},{min:500,max:899,level:4,title:"Devoted Friend",next:900},{min:900,max:Infinity,level:5,title:"Heartstring Pro",next:null}];
+function getLevel(pts){return LEVELS.find(l=>pts>=l.min&&pts<=l.max)||LEVELS[LEVELS.length-1];}
+function refreshPoints(){
+  const pts=LS.getPoints(),s=LS.getStreak(),lv=getLevel(pts);
+  document.getElementById("streak-num").textContent=s.count;
+  document.getElementById("pts-line").textContent=pts+" pts · "+lv.title;
+  document.getElementById("level-lbl").textContent="LEVEL "+lv.level;
+  if(lv.next){const pct=Math.min(100,Math.round(((pts-lv.min)/(lv.next-lv.min))*100));document.getElementById("pts-bar").style.width=pct+"%";document.getElementById("pts-prog").textContent=pts+" / "+lv.next+" pts to Level "+(lv.level+1);document.getElementById("pts-pct").textContent=pct+"%";}
+  else{document.getElementById("pts-bar").style.width="100%";document.getElementById("pts-prog").textContent="Max level reached!";document.getElementById("pts-pct").textContent="100%";}
+}
+function refreshBadges(){document.getElementById("badge-row").innerHTML=LS.getBadges().map(b=>"<div class=\"badge\">"+b+"</div>").join("");}
+function refreshCheckin(){const ci=LS.getCheckin();if(ci.date===new Date().toDateString()&&ci.done){document.getElementById("checkin-btns").innerHTML="<div style=\"font-size:13px;color:#3B6D11;font-weight:600;padding:6px 0\">✓ Checked in today — great work!</div>";}}
+function refreshPeopleScreen(){
+  const un=LS.getNotes();const rels=["Partner","Parent","Best Friend"];
+  people.forEach((p,i)=>{const tot=p.defaultNotes.length+un[i].length;document.getElementById("pc-"+i+"-sub").textContent=rels[i]+" · "+tot+" notes";});
+  const total=people.reduce((s,p,i)=>s+p.defaultNotes.length+un[i].length,0);document.getElementById("stat-notes").textContent=total;
+  const q=LS.getQuiz();document.getElementById("stat-quiz").textContent=q.total>0?Math.round((q.correct/q.total)*100)+"%":"—";
+}
+let curScreen="home",currentPerson=0;
+function showScreen(name){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.querySelectorAll(".tab-item").forEach(t=>t.classList.remove("active"));const scr=document.getElementById("screen-"+name);if(scr)scr.classList.add("active");const tab=document.getElementById("tab-"+name);if(tab)tab.classList.add("active");curScreen=name;}
+function showPerson(i){
+  currentPerson=i;const p=people[i],un=LS.getNotes();
+  document.getElementById("d-av").textContent=p.initials;document.getElementById("d-av").className="dav "+p.avc;document.getElementById("d-nm").textContent=p.name;document.getElementById("d-rl").textContent=p.rel;
+  const fields=[p.ann?["Anniversary",p.ann]:null,["Birthday",p.bday],["Job",p.job],["Loves",p.loves],["Dislikes",p.dislikes]].filter(Boolean);
+  document.getElementById("d-facts").innerHTML=fields.map(([k,v])=>"<div class=\"fr\"><div class=\"fk\">"+k+"</div><div class=\"fv\">"+v+"</div></div>").join("");
+  document.getElementById("d-events").innerHTML=p.events.map(e=>"<div class=\"rem-card\"><div style=\"font-size:13px;font-weight:600;color:#1A1208\">"+p.name+"s "+e.name+" · "+e.date+"</div><div style=\"font-size:11px;color:#9B8B78;margin-top:2px\">"+e.days+" days away</div></div>").join("");
+  document.getElementById("d-gifts").innerHTML=p.gifts.map(g=>"<div class=\"gi\"><div class=\"gdot\"></div><div style=\"font-size:12px;color:#1A1208\">"+g+"</div></div>").join("");
+  const allNotes=[...un[i],...p.defaultNotes];
+  document.getElementById("d-notes").innerHTML=allNotes.length?allNotes.map(n=>"<div class=\"ni\"><div class=\"nd\">"+n.date+"</div><div class=\"nt\">"+n.text+"</div></div>").join(""):"<div style=\"font-size:12px;color:#9B8B78;padding:6px 0\">No notes yet. Add one!</div>";
+  showScreen("detail");
+}
+
+let curQ=0,qScore=0,qAns=0,qList=[];
+function filterQuiz(pi){qList=allQs.filter(q=>q.pi===pi);}
+function initQuiz(){if(!qList.length)qList=[...allQs];curQ=0;qScore=0;qAns=0;document.getElementById("q-score").textContent="0 / 0";document.getElementById("q-bonus").textContent="+0 pts";document.getElementById("q-done").style.display="none";document.getElementById("q-card").style.display="block";loadQ();}
+function loadQ(){if(curQ>=qList.length){endQuiz();return;}const qq=qList[curQ],p=people[qq.pi];document.getElementById("q-about").textContent="ABOUT "+p.name.toUpperCase();document.getElementById("q-ctr").textContent="Question "+(curQ+1)+" of "+qList.length;document.getElementById("q-text").textContent=qq.q;document.getElementById("q-fb").style.display="none";document.getElementById("q-next").style.display="none";document.getElementById("q-opts").innerHTML=qq.opts.map((o,i)=>"<button class=\"qopt\" onclick=\"ansQ("+i+")\">"+ o+"</button>").join("");}
+function ansQ(chosen){const qq=qList[curQ],ok=chosen===qq.ans;if(ok)qScore++;qAns++;document.getElementById("q-score").textContent=qScore+" / "+qAns;document.getElementById("q-bonus").textContent="+"+(qScore*10)+" pts";document.querySelectorAll(".qopt").forEach((b,i)=>{b.disabled=true;if(i===qq.ans)b.classList.add("correct");else if(i===chosen&&!ok)b.classList.add("wrong");});const fb=document.getElementById("q-fb");fb.style.display="block";fb.style.background=ok?"#EAF3DE":"#FCEBEB";fb.style.color=ok?"#27500A":"#501313";fb.textContent=ok?"✓ Great memory!":"✗ Not quite — check your notes.";document.getElementById("q-next").style.display="block";}
+function nextQ(){curQ++;loadQ();}
+function endQuiz(){document.getElementById("q-card").style.display="none";document.getElementById("q-done").style.display="block";document.getElementById("q-res").textContent="You scored "+qScore+" out of "+qList.length;const ep=qScore*10;document.getElementById("q-pts").textContent="+"+ep+" pts";LS.addQuizResult(qScore,qList.length);LS.addPoints(ep);LS.touchStreak();if(qScore===qList.length)LS.addBadge("🏆 Perfect Score");refreshPoints();refreshBadges();toast("Quiz done! +"+ep+" pts");qList=[...allQs];}
+function checkIn(btn){btn.style.background="#4A7C59";btn.style.color="#FFF";btn.textContent="Checked in ✓";btn.disabled=true;const s=document.querySelector("#checkin-btns button:last-child");if(s)s.disabled=true;LS.setCheckin();LS.addPoints(10);LS.touchStreak();refreshPoints();toast("Great! +10 pts added");}
+function remindLater(btn){btn.textContent="Reminder set ⏰";btn.disabled=true;}
+function saveNote(){const ta=document.getElementById("note-txt");const pi=parseInt(document.getElementById("note-who").value);const text=ta.value.trim();if(!text){toast("Write something first!");return;}LS.addNote(pi,text);LS.addPoints(5);LS.touchStreak();if(LS.getNotes().flat().length>=5)LS.addBadge("📝 Note Taker");refreshPoints();refreshBadges();ta.value="";showScreen("home");toast("Note saved! +5 pts");}
+let voiceOn=false,vsec=0,vtick=null,wanim=null;
+function startVoice(e){if(e)e.preventDefault();voiceOn=true;vsec=0;document.getElementById("vbtn").style.background="#E24B4A";document.getElementById("vlbl").textContent="Recording…";vtick=setInterval(()=>{vsec++;const m=Math.floor(vsec/60),s=vsec%60;document.getElementById("vtimer").textContent=m+":"+(s<10?"0":"")+s;},1000);wanim=setInterval(()=>{document.querySelectorAll(".wbar").forEach(b=>{b.style.height=(Math.floor(Math.random()*44)+6)+"px";});},110);}
+function stopVoice(){if(!voiceOn)return;voiceOn=false;clearInterval(vtick);clearInterval(wanim);document.getElementById("vbtn").style.background="#C96A30";document.getElementById("vlbl").textContent="Voice note saved! +10 pts";document.querySelectorAll(".wbar").forEach(b=>b.style.height="8px");LS.addPoints(10);LS.touchStreak();refreshPoints();setTimeout(()=>{document.getElementById("vlbl").textContent="Hold the button to record";document.getElementById("vtimer").textContent="0:00";},2200);}
+function insertChip(t){const ta=document.getElementById("note-txt");if(ta){ta.value=(ta.value?ta.value+" ":"")+t+": ";ta.focus();}}
+let toastTimer=null;
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200);}
+function updateClock(){const now=new Date(),h=now.getHours(),m=now.getMinutes(),el=document.getElementById("clk");if(el)el.textContent=h+":"+(m<10?"0":"")+m;}
+updateClock();setInterval(updateClock,60000);
+document.getElementById("chips").innerHTML=chips.map(c=>"<div onclick=\"insertChip('"+ c +"')\" style=\"background:#FAEEDA;border:0.5px solid rgba(201,106,48,0.25);border-radius:20px;padding:5px 10px;font-size:10px;font-weight:600;color:#854F0B;cursor:pointer\">"+ c+"</div>").join("");
+document.getElementById("e10").innerHTML=e10.map((item,i)=>"<div class=\"e10-item\"><div class=\"e10-num\">"+(i+1)+"</div><div style=\"font-size:12px;color:#1A1208;line-height:1.4\">"+item+"</div></div>").join("");
+
+refreshPoints();refreshBadges();refreshCheckin();refreshPeopleScreen();initQuiz();
+</script>
+</body>
+</html>
