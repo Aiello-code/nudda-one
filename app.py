@@ -26,5 +26,9 @@ def index():
 def property_check():
     return render_template("property.html")
 
+
+@app.route("/heartstring")
+def heartstring():
+    return render_template("heartstring.html")
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
