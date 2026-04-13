@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#E8E0D4;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:0;margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-.phone{--bg:#FBF6EF;--card:#FFF;--accent:#C96A30;--accent-light:#FAEEDA;--accent-dark:#854F0B;--text:#1A1208;--text2:#9B8B78;--border:rgba(0,0,0,0.07);width:100%;max-width:430px;min-height:100vh;background:var(--bg);border-radius:0;overflow:hidden;display:flex;flex-direction:column;border:none;position:relative;margin:0 auto}
+.phone{--bg:#FBF6EF;--card:#FFF;--accent:#C96A30;--accent-light:#FAEEDA;--accent-dark:#854F0B;--text:#1A1208;--text2:#7A6A58;--border:rgba(0,0,0,0.07);width:100%;max-width:430px;min-height:100vh;background:var(--bg);border-radius:0;overflow:hidden;display:flex;flex-direction:column;border:none;position:relative;margin:0 auto}
 .status{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 6px;font-size:12px;font-weight:600;color:var(--text);flex-shrink:0}
 .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .content::-webkit-scrollbar{width:0}
@@ -69,7 +69,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
 .av-4{background:#F0E6F6;color:#6B2FA0}.av-5{background:#FCEAEA;color:#A02F2F}.av-6{background:#E8F4E8;color:#2D6A2D}
 .field-row{margin-bottom:12px}.field-lbl{font-size:10px;font-weight:700;color:#9B8B78;letter-spacing:0.5px;margin-bottom:5px;text-transform:uppercase}.field-inp{width:100%;background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;-webkit-appearance:none}.field-inp:focus{border-color:var(--accent);outline:none}
 .gift-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid rgba(0,0,0,0.06)}.gift-row:last-child{border-bottom:none}.gift-del{width:24px;height:24px;border-radius:50%;background:#FCEBEB;border:none;cursor:pointer;color:#E24B4A;font-size:16px;line-height:1;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.phone.theme-ocean{--bg:#EEF5FB;--card:#FFF;--accent:#2176AE;--accent-light:#D0E8F7;--accent-dark:#145C8A;--text:#0D2233;--text2:#5E7A8C;--border:rgba(33,118,174,0.1)}
+.phone.theme-ocean{--bg:#EEF5FB;--card:#FFF;--accent:#2176AE;--accent-light:#D0E8F7;--accent-dark:#145C8A;--text:#0D2233;--text2:#3D6478;--border:rgba(33,118,174,0.12)}
 .phone.theme-midnight{--bg:#1C1C2E;--card:#252540;--accent:#8B7CF8;--accent-light:#2D2B52;--accent-dark:#C4B8FF;--text:#E8E8F0;--text2:#8888AA;--border:rgba(255,255,255,0.08)}
 .phone.theme-midnight .bk{background:rgba(255,255,255,0.06)!important;color:var(--text)!important}
 .phone.theme-midnight .act-lbl,.phone.theme-midnight .fk{color:var(--text2)!important}
@@ -81,6 +81,33 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
 .phone.theme-ocean .rbadge,.phone.theme-ocean .echip,.phone.theme-ocean .e10-num{background:var(--accent-light)!important;color:var(--accent)!important}
 .theme-card{background:var(--card);border-radius:16px;border:0.5px solid var(--border);padding:15px;cursor:pointer;transition:border-color 0.15s}
 .theme-card.selected{border:2px solid var(--accent);}
+.theme-tlbl{font-weight:600;font-size:14px;color:var(--text)}
+.theme-tdesc{font-size:11px;color:var(--text2);margin-top:2px}
+.phone.theme-ocean .av{background:var(--accent-light)!important;color:var(--accent)!important}
+.phone.theme-midnight .av{background:var(--accent-light)!important;color:var(--accent-dark)!important}
+.phone.theme-midnight [style*='color:#1A1208']{color:var(--text)!important}
+.phone.theme-midnight [style*='color:#9B8B78']{color:var(--text2)!important}
+.phone.theme-midnight [style*='color:#6B5B45']{color:var(--text2)!important}
+.phone.theme-midnight [style*='color:#854F0B']{color:var(--accent)!important}
+.phone.theme-midnight [style*='color:#3B6D11']{color:var(--accent)!important}
+.phone.theme-midnight [style*='color:#185FA5']{color:var(--accent)!important}
+.phone.theme-midnight [style*='color:#C4B6A6']{color:var(--text2)!important}
+.phone.theme-midnight [style*='background:#FFF']{background:var(--card)!important}
+.phone.theme-midnight [style*='background:#FBF6EF']{background:var(--bg)!important}
+.phone.theme-midnight [style*='background:#F1EFE8']{background:rgba(255,255,255,0.06)!important}
+.phone.theme-midnight [style*='background:#FAEEDA']{background:var(--accent-light)!important}
+.phone.theme-midnight [style*='background:#EAF3DE']{background:var(--accent-light)!important}
+.phone.theme-midnight [style*='background:#FAECE7']{background:var(--accent-light)!important}
+.phone.theme-midnight [style*='background:#E6F1FB']{background:var(--accent-light)!important}
+.phone.theme-midnight [style*='background:#FCEBEB']{background:var(--accent-light)!important}
+.phone.theme-ocean [style*='color:#854F0B']{color:var(--accent-dark)!important}
+.phone.theme-ocean [style*='color:#C96A30']{color:var(--accent)!important}
+.phone.theme-ocean [style*='background:#FAEEDA']{background:var(--accent-light)!important}
+.phone.theme-ocean [style*='background:#EAF3DE']{background:var(--accent-light)!important}
+.phone.theme-ocean [style*='background:#FAECE7']{background:var(--accent-light)!important}
+.phone.theme-ocean [style*='background:#E6F1FB']{background:var(--accent-light)!important}
+.phone.theme-midnight .qopt.wrong{background:#3E1A1A!important;border-color:#8B3A3A!important;color:#F8B4B4!important}
+.phone.theme-midnight .qopt.correct{background:#1A3A22!important;border-color:#3A7A4A!important;color:#9AF0B2!important}
 </style>
 </head>
 <body>
@@ -108,8 +135,8 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
       </div>
     </div>
     <div class='slbl'>Upcoming events</div>
-    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Emma&#39;s Anniversary &middot; June 12</div><div style='font-size:11px;color:#9B8B78;margin-top:2px'>61 days away &middot; Time to plan a gift</div></div>
-    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Jamie&#39;s Birthday &middot; July 22</div><div style='font-size:11px;color:#9B8B78;margin-top:2px'>101 days away &middot; 3 gift ideas ready</div></div>
+    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Emma&#39;s Anniversary &middot; June 12</div><div class='theme-tdesc'>61 days away &middot; Time to plan a gift</div></div>
+    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Jamie&#39;s Birthday &middot; July 22</div><div class='theme-tdesc'>101 days away &middot; 3 gift ideas ready</div></div>
     <div class='slbl'>Quick actions</div>
     <div class='act-row'>
       <div class='act-btn' onclick="showScreen('addnote')"><div class='act-icon' style='background:#FAEEDA'>&#9999;&#65039;</div><div class='act-lbl'>Add Note</div></div>
@@ -254,7 +281,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
         <div style='width:24px;height:24px;border-radius:50%;background:#1A1208'></div>
       </div>
       <div style='display:flex;justify-content:space-between;align-items:center'>
-        <div><div style='font-weight:600;font-size:14px;color:#1A1208'>Warm</div><div style='font-size:11px;color:#9B8B78;margin-top:2px'>Cosy, earthy tones — default</div></div>
+        <div><div class='theme-tlbl'>Warm</div><div class='theme-tdesc'>Cosy, earthy tones — default</div></div>
         <div id='chk-warm' style='font-size:18px;color:#C96A30;display:none'>&#10003;</div>
       </div>
     </div>
@@ -266,7 +293,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
         <div style='width:24px;height:24px;border-radius:50%;background:#0D2233'></div>
       </div>
       <div style='display:flex;justify-content:space-between;align-items:center'>
-        <div><div style='font-weight:600;font-size:14px;color:#1A1208'>Ocean</div><div style='font-size:11px;color:#9B8B78;margin-top:2px'>Cool, calming blues</div></div>
+        <div><div class='theme-tlbl'>Ocean</div><div class='theme-tdesc'>Cool, calming blues</div></div>
         <div id='chk-ocean' style='font-size:18px;color:#2176AE;display:none'>&#10003;</div>
       </div>
     </div>
@@ -278,7 +305,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
         <div style='width:24px;height:24px;border-radius:50%;background:#E8E8F0;border:0.5px solid rgba(0,0,0,0.1)'></div>
       </div>
       <div style='display:flex;justify-content:space-between;align-items:center'>
-        <div><div style='font-weight:600;font-size:14px;color:#1A1208'>Midnight</div><div style='font-size:11px;color:#9B8B78;margin-top:2px'>Deep, focused dark mode</div></div>
+        <div><div class='theme-tlbl'>Midnight</div><div class='theme-tdesc'>Deep, focused dark mode</div></div>
         <div id='chk-midnight' style='font-size:18px;color:#8B7CF8;display:none'>&#10003;</div>
       </div>
     </div>
