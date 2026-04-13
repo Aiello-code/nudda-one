@@ -257,7 +257,7 @@ const allQs=[
 const e10=['Birthday and how they like to celebrate','Their biggest current worry or stressor','Their love language (gifts, words, quality time…)','Favourite food or restaurant','Main hobby or passion','Most important relationship in their life','Something they are currently working toward','A fond memory you share together','How they prefer to be supported when struggling','One thing that always makes them smile'];
 const chips=['Enjoyed a meal','Health update','Upcoming plan','Mood / feeling','Said something funny','Shared a memory'];
 const LS={
-  DEFAULTS:{points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
+  DEFAULTS:{people:null,points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
   get(k){const r=localStorage.getItem('hs_'+k);return r!==null?JSON.parse(r):this.DEFAULTS[k];},
   set(k,v){localStorage.setItem('hs_'+k,JSON.stringify(v));},
   getPoints(){return this.get('points');},
@@ -271,7 +271,7 @@ const LS={
   getCheckin(){return this.get('checkin');},
   setCheckin(){this.set('checkin',{date:new Date().toDateString(),done:true});},
   getQuiz(){return this.get('quiz');},
-  addQuizResult(c,t){const q=this.getQuiz();q.total+=t;q.correct+=c;this.set('quiz',q);return q;},getPeople(){const r=this.get('people');return r!==null?r:JSON.parse(JSON.stringify(DEFAULT_PEOPLE));},savePeople(p){this.set('people',p);}
+  addQuizResult(c,t){const q=this.getQuiz();q.total+=t;q.correct+=c;this.set('quiz',q);return q;},getPeople(){const r=this.get('people');return (r!==null&&r!==undefined)?r:JSON.parse(JSON.stringify(DEFAULT_PEOPLE));},savePeople(p){this.set('people',p);}
 };
 const LEVELS=[{min:0,max:99,level:1,title:"Getting Started",next:100},{min:100,max:249,level:2,title:"Caring Friend",next:250},{min:250,max:499,level:3,title:"Thoughtful Friend",next:500},{min:500,max:899,level:4,title:"Devoted Friend",next:900},{min:900,max:Infinity,level:5,title:"Heartstring Pro",next:null}];
 function getLevel(pts){return LEVELS.find(l=>pts>=l.min&&pts<=l.max)||LEVELS[LEVELS.length-1];}
