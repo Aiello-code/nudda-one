@@ -53,7 +53,7 @@ def analyze_note():
         if not note:
             return jsonify({"field": None})
 
-        prompt = f"""Analyze this note about {person.get('name', 'someone')} and extract any direct profile update.
+        prompt = f"""Analyze this note about {person.get('name', 'someone')} and extract ALL profile updates mentioned.
 
 Current profile:
   job: {person.get('job') or 'not set'}
@@ -63,22 +63,29 @@ Current profile:
 
 Note: "{note}"
 
-If the note clearly states a factual change to THIS person's profile, respond with ONLY valid JSON:
-{{"field": "job", "value": "Software Engineer", "summary": "new job as Software Engineer"}}
+Extract every definitive factual update to THIS person's profile. Respond with ONLY valid JSON:
+{{"updates": [{{"field": "job", "value": "Lawyer", "summary": "started working as a Lawyer"}}, {{"field": "loves", "value": "hiking", "summary": "loves hiking"}}]}}
 
 Valid fields: job, loves, dislikes, bday
-For loves/dislikes: return just the single new item to add.
+For loves/dislikes: return just the single new item to add (one entry per item).
 For job: return the complete new title.
-If nothing clearly maps to a profile field, respond with ONLY: {{"field": null}}
-Only extract definitive statements, not speculation or things about other people."""
+For bday: return in format like "March 5" or "1990-03-05".
+If nothing clearly maps to a profile field, respond with ONLY: {{"updates": []}}
+Only extract definitive statements, not guesses or things about other people."""
 
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=120,
+            max_tokens=300,
             messages=[{"role": "user", "content": prompt}]
         )
-        result = json.loads(message.content[0].text.strip())
-        return jsonify(result)
+        raw = message.content[0].text.strip()
+        parsed = json.loads(raw)
+        if 'updates' in parsed:
+            return jsonify(parsed)
+        elif parsed.get('field'):
+            return jsonify({"updates": [{"field": parsed['field'], "value": parsed['value'], "summary": parsed.get('summary','')}]})
+        else:
+            return jsonify({"updates": []})
     except Exception:
         return jsonify({"field": None})
 

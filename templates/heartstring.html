@@ -323,7 +323,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
   </div>
 </div>
 <div id='ai-suggest'>
-  <div style='font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.6px;margin-bottom:6px'>&#129504; AI SUGGESTION</div>
+  <div style='font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.6px;margin-bottom:6px'>&#129504; AI SUGGESTION<span id='ai-ctr' style='font-weight:400;opacity:0.7'></span></div>
   <div class='ai-row'>
     <div id='ai-msg' style='font-size:13px;color:var(--text);line-height:1.4;flex:1'></div>
     <div class='ai-btns'>
@@ -462,11 +462,11 @@ function applyTheme(name){
     if(chk)chk.style.display=t===name?'block':'none';
   });
 }
-let aiPending=null;
-function dismissAI(){document.getElementById('ai-suggest').classList.remove('show');aiPending=null;}
+let aiQueue=[];
+function dismissAI(){aiQueue.shift();if(aiQueue.length>0){_showNextAI();}else{document.getElementById('ai-suggest').classList.remove('show');}}
 function applyAISuggestion(){
-  if(!aiPending)return;
-  const {pi,field,value}=aiPending;
+  if(!aiQueue.length)return;
+  const {pi,field,value}=aiQueue[0];
   const p=people[pi];
   if(field==='loves'||field==='dislikes'){
     const cur=p[field]||'';
@@ -480,23 +480,28 @@ function applyAISuggestion(){
   dismissAI();
   toast('Profile updated!');
 }
+function _showNextAI(){
+  const s=aiQueue[0];if(!s||!people[s.pi])return;
+  const nm=escHtml(people[s.pi].name),fld=escHtml(s.field),val=escHtml(s.value);
+  document.getElementById('ai-msg').innerHTML='<span style="color:var(--accent);font-size:11px">'+nm+'</span> — update <b>'+fld+'</b> to <span style="color:var(--accent)">"'+val+'"</span>';
+  const ctr=document.getElementById('ai-ctr');if(ctr)ctr.textContent=aiQueue.length>1?' ('+aiQueue.length+' updates)':'';
+}
 function showAISuggestion(pi,field,value,summary){if(!people[pi])return;
-  aiPending={pi,field,value};
-  document.getElementById('ai-msg').textContent='Update '+people[pi].name+"'s "+field+' to “'+value+'”?';
-  document.getElementById('ai-suggest').classList.add('show');
+  aiQueue.push({pi,field,value});
+  if(aiQueue.length===1){_showNextAI();document.getElementById('ai-suggest').classList.add('show');}
 }
 async function analyzeNote(pi,text){
   try{
     const p=people[pi];
+    if(!p)return;
     const res=await fetch('/api/analyze-note',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({note:text,person:{name:p.name,rel:p.rel,job:p.job,loves:p.loves,dislikes:p.dislikes,bday:p.bday}})
     });
     const data=await res.json();
-    if(data.field&&data.value){
-      showAISuggestion(pi,data.field,data.value,data.summary);
-    }
+    const updates=data.updates||[];
+    updates.forEach(u=>{if(u.field&&u.value)showAISuggestion(pi,u.field,u.value,u.summary||'');});
   }catch(e){}
 }
 function renderInsights(data){
