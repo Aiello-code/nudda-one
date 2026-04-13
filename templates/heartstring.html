@@ -43,7 +43,7 @@ body{background:#E8E0D4;display:flex;justify-content:center;align-items:flex-sta
 .dnm{font-size:19px;font-weight:700;color:#1A1208;font-family:Georgia,serif}.rbadge{display:inline-block;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:#FAEEDA;color:#854F0B;margin-top:3px}
 .fr{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,0.05)}.fr:last-child{border-bottom:none}
 .fk{font-size:11px;color:#9B8B78}.fv{font-size:12px;color:#1A1208;font-weight:500;text-align:right;max-width:190px;line-height:1.4}
-.ni{padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,0.06)}.ni:last-child{border-bottom:none}
+.ni{padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,0.06)}.ni:last-child{border-bottom:none}.ni button:hover{opacity:1!important}
 .nd{font-size:9px;color:#9B8B78;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}.nt{font-size:12px;color:#1A1208;line-height:1.5}
 .gi{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:0.5px solid rgba(0,0,0,0.06)}.gi:last-child{border-bottom:none}
 .gdot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0}
@@ -410,6 +410,16 @@ function refreshNoteWho(){
 }
 let curScreen="home",currentPerson=0;
 function showScreen(name){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.querySelectorAll(".tab-item").forEach(t=>t.classList.remove("active"));const scr=document.getElementById("screen-"+name);if(scr)scr.classList.add("active");const tab=document.getElementById("tab-"+name);if(tab)tab.classList.add("active");curScreen=name;}
+function deleteNote(pi,ni){
+  const notes=LS.getNotes();
+  if(notes[pi]){notes[pi].splice(ni,1);LS.set('notes',notes);}
+  showPerson(pi);
+  toast('Note deleted');
+}
+async function analyzeNoteFromDetail(pi,text){
+  toast('Analysing note…');
+  await analyzeNote(pi,text);
+}
 function showPerson(i){
   currentPerson=i;const p=people[i],un=LS.getNotes();
   document.getElementById("d-av").textContent=p.initials;document.getElementById("d-av").className="dav "+p.avc;document.getElementById("d-nm").textContent=p.name;document.getElementById("d-rl").textContent=p.rel;
@@ -417,8 +427,15 @@ function showPerson(i){
   document.getElementById("d-facts").innerHTML=fields.map(([k,v])=>"<div class=\"fr\"><div class=\"fk\">"+k+"</div><div class=\"fv\">"+v+"</div></div>").join("");
   document.getElementById("d-events").innerHTML=p.events.map(e=>"<div class=\"rem-card\"><div style=\"font-size:13px;font-weight:600;color:#1A1208\">"+p.name+"s "+e.name+" · "+e.date+"</div><div style=\"font-size:11px;color:#9B8B78;margin-top:2px\">"+e.days+" days away</div></div>").join("");
   document.getElementById("d-gifts").innerHTML=p.gifts.map(g=>"<div class=\"gi\"><div class=\"gdot\"></div><div style=\"font-size:12px;color:#1A1208\">"+g+"</div></div>").join("");
-  const allNotes=[...(un[i]||[]),...p.defaultNotes];
-  document.getElementById("d-notes").innerHTML=allNotes.length?allNotes.map(n=>"<div class=\"ni\"><div class=\"nd\">"+n.date+"</div><div class=\"nt\">"+n.text+"</div></div>").join(""):"<div style=\"font-size:12px;color:#9B8B78;padding:6px 0\">No notes yet. Add one!</div>";
+  const userNotes=(un[i]||[]);
+  const defNotes=p.defaultNotes||[];
+  function _noteRow(n,ni,isUser){
+    const delBtn=isUser?"<button onclick=\"deleteNote("+i+","+ni+")\" style=\"background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;opacity:0.5;line-height:1\" title=\"Delete note\">&#128465;</button>":'';
+    const aiBtn="<button onclick=\"analyzeNoteFromDetail("+i+",\'"+n.text.replace(/'/g,"\\'").replace(/"/g,'\\"')+"'\" style=\"background:none;border:none;cursor:pointer;font-size:13px;padding:2px 4px;opacity:0.5;line-height:1\" title=\"Update profile from note\">&#129504;</button>";
+    return "<div class=\"ni\"><div style=\"display:flex;justify-content:space-between;align-items:flex-start\"><div style=\"flex:1\"><div class=\"nd\">"+n.date+"</div><div class=\"nt\">"+n.text+"</div></div><div style=\"display:flex;gap:2px;margin-left:6px;margin-top:2px\">"+aiBtn+delBtn+"</div></div></div>";
+  }
+  const allRows=userNotes.map((n,ni)=>_noteRow(n,ni,true)).concat(defNotes.map((n)=>_noteRow(n,0,false)));
+  document.getElementById("d-notes").innerHTML=allRows.length?allRows.join(""):"<div style=\"font-size:12px;color:#9B8B78;padding:6px 0\">No notes yet. Add one!</div>";
   showScreen("detail");
 }
 
