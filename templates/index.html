@@ -3,52 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trump Tracker</title>
+    <title>jamespelosi.com</title>
     <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            text-align: center;
-            background-color: black;
+            background-color: #0a0a0a;
             color: white;
             font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
         h1 {
-            font-size: 3rem;
-            color: red;
-            text-shadow: 2px 2px 5px yellow;
+            font-size: 2.4rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
         }
-        p {
-            font-size: 1.5rem;
+        .subtitle {
+            color: #888;
+            font-size: 1rem;
+            margin-bottom: 50px;
         }
-        img {
-            width: 300px;
-            border: 5px solid white;
-            border-radius: 10px;
-            margin-top: 20px;
+        .cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 420px;
         }
-        .nav {
-            margin-top: 40px;
-        }
-        .nav a {
-            color: #FFD700;
-            font-size: 1.1rem;
+        .card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 14px;
+            padding: 20px 22px;
             text-decoration: none;
-            border: 2px solid #FFD700;
-            padding: 10px 20px;
-            border-radius: 8px;
+            color: white;
+            transition: background 0.15s, border-color 0.15s;
         }
-        .nav a:hover {
-            background: #FFD700;
-            color: black;
+        .card:hover {
+            background: #1e1e1e;
+            border-color: #444;
+        }
+        .card-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        .card-text h2 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+        .card-text p {
+            font-size: 0.85rem;
+            color: #888;
+            line-height: 1.4;
+        }
+        .arrow {
+            margin-left: auto;
+            color: #444;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        footer {
+            margin-top: 50px;
+            color: #444;
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
-    <h1>🚨 TRUMP MENTIONS ALERT 🚨</h1>
-    <p>Trump is on the front page of the SMH <strong>{{ mention_count }}</strong> times right now!</p>
-    <img src="{{ url_for('static', filename='trump.jpg') }}" alt="Donald Trump">
-    <div class="nav">
-        <a href="/property">🏠 Is it a good time to buy in Sydney? →</a>
-            <a href="/heartstring" style="display:block;margin-top:10px;color:#FFD700;font-size:1.1rem;text-decoration:none;border:2px solid #FFD700;padding:10px 20px;border-radius:8px">&#10084;&#65039; Heartstring &rarr;</a>
-</div>
+    <h1>jamespelosi.com</h1>
+    <p class="subtitle">A collection of things</p>
+
+    <div class="cards">
+        <a class="card" href="/trump">
+            <div class="card-icon">🚨</div>
+            <div class="card-text">
+                <h2>Trump Tracker</h2>
+                <p>How many times is Trump mentioned on the SMH right now?</p>
+            </div>
+            <div class="arrow">›</div>
+        </a>
+        <a class="card" href="/property">
+            <div class="card-icon">🏠</div>
+            <div class="card-text">
+                <h2>Sydney Property Check</h2>
+                <p>Is now a good time to buy Sydney property?</p>
+            </div>
+            <div class="arrow">›</div>
+        </a>
+        <a class="card" href="/heartstring">
+            <div class="card-icon">❤️</div>
+            <div class="card-text">
+                <h2>Heartstring</h2>
+                <p>Remember what matters about the people you care about.</p>
+            </div>
+            <div class="arrow">›</div>
+        </a>
+    </div>
+
+    <footer>jamespelosi.com</footer>
 </body>
 </html>
