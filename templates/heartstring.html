@@ -216,7 +216,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     <div style='font-size:32px;margin-bottom:10px'>&#10024;</div>
     <div style='font-size:13px;color:var(--text2)'>Thinking about your circle...</div>
   </div>
-  <div id='ins-content'>
+  <div id='ins-content' style='display:none'>
     <div class='slbl'>Today&#39;s reflection</div>
     <div id='ins-reflection'><div class='daily-card'><div class='dlbl'>Loading...</div><div class='dqt'>&#8220;Your personalised insights will appear here.&#8221;</div></div></div>
     <div class='slbl'>Suggested questions</div>
@@ -425,7 +425,7 @@ function showPerson(i){
 let curQ=0,qScore=0,qAns=0,qList=[];
 function filterQuiz(pi){qList=allQs.filter(q=>q.pi===pi);}
 function initQuiz(){if(!qList.length)qList=[...allQs];curQ=0;qScore=0;qAns=0;document.getElementById("q-score").textContent="0 / 0";document.getElementById("q-bonus").textContent="+0 pts";document.getElementById("q-done").style.display="none";document.getElementById("q-card").style.display="block";loadQ();}
-function loadQ(){if(curQ>=qList.length){endQuiz();return;}const qq=qList[curQ],p=people[qq.pi];document.getElementById("q-about").textContent="ABOUT "+p.name.toUpperCase();document.getElementById("q-ctr").textContent="Question "+(curQ+1)+" of "+qList.length;document.getElementById("q-text").textContent=qq.q;document.getElementById("q-fb").style.display="none";document.getElementById("q-next").style.display="none";document.getElementById("q-opts").innerHTML=qq.opts.map((o,i)=>"<button class=\"qopt\" onclick=\"ansQ("+i+")\">"+ o+"</button>").join("");}
+function loadQ(){if(curQ>=qList.length){endQuiz();return;}const qq=qList[curQ],p=people[qq.pi];if(!p){qList.splice(curQ,1);loadQ();return;}document.getElementById("q-about").textContent="ABOUT "+p.name.toUpperCase();document.getElementById("q-ctr").textContent="Question "+(curQ+1)+" of "+qList.length;document.getElementById("q-text").textContent=qq.q;document.getElementById("q-fb").style.display="none";document.getElementById("q-next").style.display="none";document.getElementById("q-opts").innerHTML=qq.opts.map((o,i)=>"<button class=\"qopt\" onclick=\"ansQ("+i+")\">"+ o+"</button>").join("");}
 function ansQ(chosen){const qq=qList[curQ],ok=chosen===qq.ans;if(ok)qScore++;qAns++;document.getElementById("q-score").textContent=qScore+" / "+qAns;document.getElementById("q-bonus").textContent="+"+(qScore*10)+" pts";document.querySelectorAll(".qopt").forEach((b,i)=>{b.disabled=true;if(i===qq.ans)b.classList.add("correct");else if(i===chosen&&!ok)b.classList.add("wrong");});const fb=document.getElementById("q-fb");fb.style.display="block";fb.style.background=ok?"#EAF3DE":"#FCEBEB";fb.style.color=ok?"#27500A":"#501313";fb.textContent=ok?"✓ Great memory!":"✗ Not quite — check your notes.";document.getElementById("q-next").style.display="block";}
 function nextQ(){curQ++;loadQ();}
 function endQuiz(){document.getElementById("q-card").style.display="none";document.getElementById("q-done").style.display="block";document.getElementById("q-res").textContent="You scored "+qScore+" out of "+qList.length;const ep=qScore*10;document.getElementById("q-pts").textContent="+"+ep+" pts";LS.addQuizResult(qScore,qList.length);LS.addPoints(ep);LS.touchStreak();if(qScore===qList.length)LS.addBadge("🏆 Perfect Score");refreshPoints();refreshBadges();toast("Quiz done! +"+ep+" pts");qList=[...allQs];}
@@ -480,7 +480,7 @@ function applyAISuggestion(){
   dismissAI();
   toast('Profile updated!');
 }
-function showAISuggestion(pi,field,value,summary){
+function showAISuggestion(pi,field,value,summary){if(!people[pi])return;
   aiPending={pi,field,value};
   document.getElementById('ai-msg').textContent='Update '+people[pi].name+"'s "+field+' to “'+value+'”?';
   document.getElementById('ai-suggest').classList.add('show');
@@ -509,17 +509,29 @@ function renderInsights(data){
     return;
   }
   if(rDiv)rDiv.innerHTML="<div class='daily-card'><div class='dlbl'>About "+escHtml(data.reflection.person)+"</div><div class='dqt'>&#8220;"+escHtml(data.reflection.text)+"&#8221;</div></div>";
-  if(qDiv)qDiv.innerHTML=(data.questions||[]).map(q=>
-    "<div class='card'><div style='font-size:10px;font-weight:700;color:var(--text2);margin-bottom:9px'>FOR "+escHtml(q.person.toUpperCase())+"</div><div style='font-size:12px;color:var(--text);line-height:2.1'>"+
-    q.items.map(it=>'&bull; '+escHtml(it)).join('<br>')+"</div></div>"
-  ).join('');
-  if(psub&&data.ts){const h=Math.floor((Date.now()-data.ts)/3600000);psub.textContent=h<1?'Just updated':`Updated ${h}h ago`;}
+  if(qDiv){
+    try{
+      qDiv.innerHTML=(data.questions||[]).map(function(q){
+        var name=escHtml((q.person||'').toUpperCase());
+        var its=q.items||q.questions||q.suggestions||[];
+        var bullets=Array.isArray(its)?its.map(function(it){return '&bull; '+escHtml(String(it||''));}).join('<br>'):'';
+        return "<div class='card'><div style='font-size:10px;font-weight:700;color:var(--text2);margin-bottom:9px'>FOR "+name+"</div><div style='font-size:12px;color:var(--text);line-height:2.1'>"+bullets+"</div></div>";
+      }).join('');
+    }catch(e){qDiv.innerHTML='';}
+  }
+  if(psub&&data.ts){var h=Math.floor((Date.now()-data.ts)/3600000);psub.textContent=h<1?'Just updated':'Updated '+h+'h ago';}
 }
 async function loadInsights(force){
-  const cached=LS.getInsights();
-  if(!force&&cached&&cached.ts&&(Date.now()-cached.ts)<43200000){renderInsights(cached);return;}
   const ld=document.getElementById('ins-loading');
   const ic=document.getElementById('ins-content');
+  const cached=LS.getInsights();
+  const isStale=!cached||!cached.ts||(Date.now()-cached.ts)>=43200000;
+  if(!force&&!isStale){
+    if(ld)ld.style.display='none';
+    if(ic)ic.style.display='block';
+    renderInsights(cached);
+    return;
+  }
   if(ld)ld.style.display='block';
   if(ic)ic.style.display='none';
   try{
@@ -527,9 +539,9 @@ async function loadInsights(force){
     const pd=people.map((p,i)=>({...p,recentNotes:[...(notes[i]||[]).slice(0,3),...p.defaultNotes.slice(0,2)]}));
     const res=await fetch('/api/generate-insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({people:pd})});
     const data=await res.json();
-    if(data.reflection){data.ts=Date.now();LS.setInsights(data);renderInsights(data);}
-    else{renderInsights(cached);}
-  }catch(e){renderInsights(cached);}
+    if(data&&data.reflection){data.ts=Date.now();LS.setInsights(data);renderInsights(data);}
+    else{if(cached)renderInsights(cached);}
+  }catch(e){if(cached)renderInsights(cached);}
   finally{if(ld)ld.style.display='none';if(ic)ic.style.display='block';}
 }
 let toastTimer=null;
