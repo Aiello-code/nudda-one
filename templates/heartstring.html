@@ -65,6 +65,10 @@ body{background:#E8E0D4;display:flex;justify-content:center;align-items:flex-sta
 .e10-item{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:0.5px solid rgba(0,0,0,0.05)}.e10-item:last-child{border-bottom:none}
 .e10-num{width:19px;height:19px;border-radius:50%;background:#FAEEDA;color:#854F0B;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+
+.av-4{background:#F0E6F6;color:#6B2FA0}.av-5{background:#FCEAEA;color:#A02F2F}.av-6{background:#E8F4E8;color:#2D6A2D}
+.field-row{margin-bottom:12px}.field-lbl{font-size:10px;font-weight:700;color:#9B8B78;letter-spacing:0.5px;margin-bottom:5px;text-transform:uppercase}.field-inp{width:100%;background:#FFF;border:0.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:9px 12px;font-size:13px;color:#1A1208;outline:none;font-family:inherit;-webkit-appearance:none}.field-inp:focus{border-color:#C96A30;outline:none}
+.gift-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid rgba(0,0,0,0.06)}.gift-row:last-child{border-bottom:none}.gift-del{width:24px;height:24px;border-radius:50%;background:#FCEBEB;border:none;cursor:pointer;color:#E24B4A;font-size:16px;line-height:1;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -115,11 +119,13 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     <div style='height:20px'></div>
   </div>
   <div class='content screen' id='screen-people'>
-    <div class='ph'><div class='ptitle'>Your Circle</div><div class='psub'>3 of 3 people added</div></div>
+    <div class='ph'><div class='ptitle'>Your Circle</div><div class='psub' id='circle-sub'>3 of 3 people added</div></div>
     <div class='slbl'>Relationships</div>
-    <div class='person-card' onclick="showPerson(0)"><div class='av av-1'>EM</div><div style='flex:1'><div class='pname'>Emma</div><div class='prel' id='pc-0-sub'>Partner &middot; 12 notes</div></div><div class='echip'>Anniversary<br>61 days</div></div>
-    <div class='person-card' onclick="showPerson(1)"><div class='av av-2'>DA</div><div style='flex:1'><div class='pname'>Dad</div><div class='prel' id='pc-1-sub'>Parent &middot; 7 notes</div></div><div class='echip'>Birthday<br>205 days</div></div>
-    <div class='person-card' onclick="showPerson(2)"><div class='av av-3'>JA</div><div style='flex:1'><div class='pname'>Jamie</div><div class='prel' id='pc-2-sub'>Best Friend &middot; 8 notes</div></div><div class='echip'>Birthday<br>101 days</div></div>
+    <div id='people-list'></div>
+    <div class='person-card' onclick="showScreen('addperson')" style='border:1.5px dashed rgba(0,0,0,0.12);background:transparent;margin-bottom:4px'>
+      <div style='width:46px;height:46px;border-radius:50%;border:2px dashed rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;font-size:22px;color:#9B8B78;flex-shrink:0'>+</div>
+      <div style='flex:1'><div class='pname' style='color:#9B8B78'>Add someone</div><div class='prel'>Tap to add to your circle</div></div>
+    </div>
     <div class='slbl'>Stats</div>
     <div class='stat-grid'>
       <div class='stat-card'><div class='stat-l'>Total notes</div><div class='stat-n' id='stat-notes'>27</div></div>
@@ -130,7 +136,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     <div style='height:20px'></div>
   </div>
   <div class='content screen' id='screen-detail' style='padding-bottom:20px'>
-    <div class='dh'><div class='bk' onclick="showScreen('people')">&#8592;</div><div class='dav' id='d-av' style='background:#FAEEDA;color:#854F0B'>EM</div><div><div class='dnm' id='d-nm'>Emma</div><div class='rbadge' id='d-rl'>Partner</div></div></div>
+    <div class='dh'><div class='bk' onclick="showScreen('people')">&#8592;</div><div class='dav' id='d-av' style='background:#FAEEDA;color:#854F0B'>EM</div><div style='flex:1'><div class='dnm' id='d-nm'>Emma</div><div class='rbadge' id='d-rl'>Partner</div></div><button onclick='startEditPerson(currentPerson)' style='background:#F1EFE8;border:none;border-radius:10px;padding:6px 14px;font-size:12px;font-weight:600;color:#6B5B45;cursor:pointer;font-family:inherit;flex-shrink:0'>Edit</button></div>
     <div class='slbl'>Profile</div><div class='card' id='d-facts'></div>
     <div class='slbl'>Upcoming events</div><div id='d-events'></div>
     <div class='slbl'>Gift ideas</div><div class='card' id='d-gifts'></div>
@@ -172,7 +178,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     <div class='dh'><div class='bk' onclick="showScreen('home')">&#8592;</div><div style='font-size:15px;font-weight:600;color:#1A1208'>Quick Note</div></div>
     <div style='padding:14px 20px'>
       <select id='note-who' style='width:100%;background:#FFF;border:0.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:9px 12px;font-size:13px;color:#1A1208;outline:none;margin-bottom:10px'>
-        <option value='0'>About Emma</option><option value='1'>About Dad</option><option value='2'>About Jamie</option>
+        
       </select>
       <textarea id='note-txt' style='width:100%;background:#FFF;border:0.5px solid rgba(0,0,0,0.12);border-radius:13px;padding:13px;font-size:13px;color:#1A1208;resize:none;min-height:120px;outline:none' placeholder='What do you want to remember?' rows='5'></textarea>
       <div style='font-size:11px;color:#9B8B78;margin:10px 0 7px;font-weight:600'>QUICK PROMPTS</div>
@@ -197,17 +203,44 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
       </div>
     </div>
   </div>
-  <div class='toast' id='toast'></div>
+  <div class='content screen' id='screen-editperson' style='padding-bottom:20px'>
+<div class='ph'><div class='bk' onclick='cancelEdit()'>&#8592;</div><div class='ptitle' id='edit-title'>Edit</div></div>
+<div style='padding:0 20px'>
+<div class='field-row'><div class='field-lbl'>Name</div><input class='field-inp' id='ef-name' placeholder='Name'></div>
+<div class='field-row'><div class='field-lbl'>Relationship</div><input class='field-inp' id='ef-rel' placeholder='e.g. Partner, Best Friend'></div>
+<div class='field-row'><div class='field-lbl'>Birthday</div><input class='field-inp' id='ef-bday' placeholder='e.g. 15 March 1992'></div>
+<div class='field-row'><div class='field-lbl'>Anniversary</div><input class='field-inp' id='ef-ann' placeholder='Leave blank if none'></div>
+<div class='field-row'><div class='field-lbl'>Job</div><input class='field-inp' id='ef-job' placeholder='Occupation'></div>
+<div class='field-row'><div class='field-lbl'>Loves</div><input class='field-inp' id='ef-loves' placeholder='Hobbies, interests'></div>
+<div class='field-row'><div class='field-lbl'>Dislikes</div><input class='field-inp' id='ef-dislikes' placeholder='Things they dislike'></div>
+<div style='margin-top:10px'><div class='field-lbl' style='margin-bottom:6px'>Gift ideas</div><div id='edit-gifts'></div>
+<button onclick='addGiftInEdit()' style='margin-top:6px;background:#FBF6EF;border:0.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:8px 14px;font-size:12px;color:#6B5B45;cursor:pointer;font-family:inherit'>+ Add gift idea</button></div>
+<button onclick='saveEditPerson()' style='margin-top:20px;width:100%;background:#C96A30;color:#FFF;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit'>Save changes</button>
+<button onclick='confirmDeletePerson()' style='margin-top:10px;width:100%;background:#FBF6EF;border:0.5px solid rgba(220,80,80,0.3);border-radius:14px;padding:12px;font-size:13px;font-weight:600;color:#C03030;cursor:pointer;font-family:inherit'>Remove from circle</button>
+</div></div>
+<div class='content screen' id='screen-addperson' style='padding-bottom:20px'>
+<div class='ph'><div class='bk' onclick="showScreen('people')">&#8592;</div><div class='ptitle'>Add to Circle</div></div>
+<div style='padding:0 20px'>
+<div class='field-row'><div class='field-lbl'>Name</div><input class='field-inp' id='af-name' placeholder='Name'></div>
+<div class='field-row'><div class='field-lbl'>Relationship</div><input class='field-inp' id='af-rel' placeholder='e.g. Partner, Best Friend'></div>
+<div class='field-row'><div class='field-lbl'>Birthday (optional)</div><input class='field-inp' id='af-bday' placeholder='e.g. 15 March 1992'></div>
+<div class='field-row'><div class='field-lbl'>Anniversary (optional)</div><input class='field-inp' id='af-ann' placeholder='Leave blank if none'></div>
+<div class='field-row'><div class='field-lbl'>Job (optional)</div><input class='field-inp' id='af-job' placeholder='Occupation'></div>
+<div class='field-row'><div class='field-lbl'>Loves (optional)</div><input class='field-inp' id='af-loves' placeholder='Hobbies, interests'></div>
+<div class='field-row'><div class='field-lbl'>Dislikes (optional)</div><input class='field-inp' id='af-dislikes' placeholder='Things they dislike'></div>
+<button onclick='submitAddPerson()' style='margin-top:20px;width:100%;background:#C96A30;color:#FFF;border:none;border-radius:14px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit'>Add to circle</button>
+</div></div>
+<div class='toast' id='toast'></div>
   <div class='tab-bar'>
     <div class='tab-item active' id='tab-home' onclick="showScreen('home')"><div class='tab-icon'>&#127968;</div><div class='tab-lbl'>Home</div></div>
-    <div class='tab-item' id='tab-people' onclick="showScreen('people');refreshPeopleScreen()"><div class='tab-icon'>&#128101;</div><div class='tab-lbl'>Circle</div></div>
+    <div class='tab-item' id='tab-people' onclick="showScreen('people');renderCircle()"><div class='tab-icon'>&#128101;</div><div class='tab-lbl'>Circle</div></div>
     <div class='tab-item' id='tab-quiz' onclick="showScreen('quiz');initQuiz()"><div class='tab-icon'>&#129504;</div><div class='tab-lbl'>Quiz</div></div>
     <div class='tab-item' id='tab-insights' onclick="showScreen('insights')"><div class='tab-icon'>&#128161;</div><div class='tab-lbl'>Insights</div></div>
   </div>
 </div>
 
 <script>
-const people=[
+const DEFAULT_PEOPLE=[
   {name:'Emma',rel:'Partner',initials:'EM',avc:'av-1',bday:'15 March 1992',ann:'12 June 2019',job:'Graphic Designer',loves:'Sushi, hiking, true crime podcasts',dislikes:'Loud restaurants, surprises',events:[{name:'Anniversary',date:'June 12, 2026',days:61}],gifts:['Pottery class for two','Japan travel guidebook','Noise-cancelling headphones'],defaultNotes:[{date:'10 Apr 2026',text:'Mentioned feeling overwhelmed at work — big project deadline approaching'},{date:'5 Apr 2026',text:'Really enjoyed the Thai restaurant on King St, wants to return'},{date:'28 Mar 2026',text:'Dreams of visiting Japan next year — planning has started'}]},
   {name:'Dad',rel:'Parent',initials:'DA',avc:'av-2',bday:'3 November 1958',ann:null,job:'Retired electrician',loves:'Golf, crosswords, 60s music',dislikes:'Spicy food, technology',events:[{name:'Birthday',date:'Nov 3, 2026',days:205}],gifts:['Golf lesson voucher','Times crossword collection','Beatles vinyl record'],defaultNotes:[{date:'8 Apr 2026',text:'Knee bothering him again — physio next week'},{date:'15 Mar 2026',text:'Proud of completing the crossword 3 days running'}]},
   {name:'Jamie',rel:'Best Friend',initials:'JA',avc:'av-3',bday:'22 July 1991',ann:null,job:'Software engineer',loves:'Board games, specialty coffee, cycling',dislikes:'Crowds, slow Wi-Fi',events:[{name:'Birthday',date:'Jul 22, 2026',days:101}],gifts:['Running shoes gift card','Board game expansion pack','Coffee subscription box'],defaultNotes:[{date:'11 Apr 2026',text:'Just started marathon training — first big race'},{date:'1 Apr 2026',text:'Stressed about work promotion, reviewed in May'}]}
@@ -224,7 +257,7 @@ const allQs=[
 const e10=['Birthday and how they like to celebrate','Their biggest current worry or stressor','Their love language (gifts, words, quality time…)','Favourite food or restaurant','Main hobby or passion','Most important relationship in their life','Something they are currently working toward','A fond memory you share together','How they prefer to be supported when struggling','One thing that always makes them smile'];
 const chips=['Enjoyed a meal','Health update','Upcoming plan','Mood / feeling','Said something funny','Shared a memory'];
 const LS={
-  DEFAULTS:{points:340,streak:{count:7,lastDate:null},notes:[[],[],[]],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
+  DEFAULTS:{points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
   get(k){const r=localStorage.getItem('hs_'+k);return r!==null?JSON.parse(r):this.DEFAULTS[k];},
   set(k,v){localStorage.setItem('hs_'+k,JSON.stringify(v));},
   getPoints(){return this.get('points');},
@@ -232,16 +265,17 @@ const LS={
   getStreak(){return this.get('streak');},
   touchStreak(){const today=new Date().toDateString();const s=this.getStreak();if(s.lastDate===today)return s;const yest=new Date(Date.now()-86400000).toDateString();s.count=(s.lastDate===yest)?s.count+1:1;s.lastDate=today;this.set('streak',s);return s;},
   getNotes(){return this.get('notes');},
-  addNote(pi,text){const notes=this.getNotes();const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];notes[pi].unshift({date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text});this.set('notes',notes);return notes;},
+  addNote(pi,text){const notes=this.getNotes();if(!notes[pi])notes[pi]=[];const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];notes[pi].unshift({date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text});this.set('notes',notes);return notes;},
   getBadges(){return this.get('badges');},
   addBadge(b){const badges=this.getBadges();if(!badges.includes(b)){badges.push(b);this.set('badges',badges);}return badges;},
   getCheckin(){return this.get('checkin');},
   setCheckin(){this.set('checkin',{date:new Date().toDateString(),done:true});},
   getQuiz(){return this.get('quiz');},
-  addQuizResult(c,t){const q=this.getQuiz();q.total+=t;q.correct+=c;this.set('quiz',q);return q;}
+  addQuizResult(c,t){const q=this.getQuiz();q.total+=t;q.correct+=c;this.set('quiz',q);return q;},getPeople(){const r=this.get('people');return r!==null?r:JSON.parse(JSON.stringify(DEFAULT_PEOPLE));},savePeople(p){this.set('people',p);}
 };
 const LEVELS=[{min:0,max:99,level:1,title:"Getting Started",next:100},{min:100,max:249,level:2,title:"Caring Friend",next:250},{min:250,max:499,level:3,title:"Thoughtful Friend",next:500},{min:500,max:899,level:4,title:"Devoted Friend",next:900},{min:900,max:Infinity,level:5,title:"Heartstring Pro",next:null}];
 function getLevel(pts){return LEVELS.find(l=>pts>=l.min&&pts<=l.max)||LEVELS[LEVELS.length-1];}
+let people=LS.getPeople();
 function refreshPoints(){
   const pts=LS.getPoints(),s=LS.getStreak(),lv=getLevel(pts);
   document.getElementById("streak-num").textContent=s.count;
@@ -253,10 +287,24 @@ function refreshPoints(){
 function refreshBadges(){document.getElementById("badge-row").innerHTML=LS.getBadges().map(b=>"<div class=\"badge\">"+b+"</div>").join("");}
 function refreshCheckin(){const ci=LS.getCheckin();if(ci.date===new Date().toDateString()&&ci.done){document.getElementById("checkin-btns").innerHTML="<div style=\"font-size:13px;color:#3B6D11;font-weight:600;padding:6px 0\">✓ Checked in today — great work!</div>";}}
 function refreshPeopleScreen(){
-  const un=LS.getNotes();const rels=["Partner","Parent","Best Friend"];
-  people.forEach((p,i)=>{const tot=p.defaultNotes.length+un[i].length;document.getElementById("pc-"+i+"-sub").textContent=rels[i]+" · "+tot+" notes";});
-  const total=people.reduce((s,p,i)=>s+p.defaultNotes.length+un[i].length,0);document.getElementById("stat-notes").textContent=total;
-  const q=LS.getQuiz();document.getElementById("stat-quiz").textContent=q.total>0?Math.round((q.correct/q.total)*100)+"%":"—";
+  const q=LS.getQuiz();
+  const n=LS.getNotes();
+  document.getElementById('stat-notes').textContent=people.reduce((s,p,i)=>s+p.defaultNotes.length+(n[i]||[]).length,0);
+  document.getElementById('stat-quiz').textContent=q.total>0?Math.round((q.correct/q.total)*100)+'%':'—';
+  document.getElementById('circle-sub').textContent=people.length+' of '+people.length+' people added';
+}
+function renderCircle(){
+  const n=LS.getNotes();
+  document.getElementById('people-list').innerHTML=people.map((p,i)=>{
+    const nc=(n[i]||[]).length+p.defaultNotes.length;
+    return "<div class='person-card' onclick='showPerson("+i+")'><div class='av "+p.avc+"'>"+p.initials+"</div><div style='flex:1'><div class='pname'>"+p.name+"</div><div class='prel'>"+p.rel+" &middot; "+nc+" notes</div></div><div style='font-size:18px;color:#C4B6A6'>&#8250;</div></div>";
+  }).join('');
+  refreshPeopleScreen();
+  refreshNoteWho();
+}
+function refreshNoteWho(){
+  const s=document.getElementById('note-who');
+  if(s)s.innerHTML=people.map((p,i)=>"<option value='"+i+"'>About "+p.name+"</option>").join('');
 }
 let curScreen="home",currentPerson=0;
 function showScreen(name){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.querySelectorAll(".tab-item").forEach(t=>t.classList.remove("active"));const scr=document.getElementById("screen-"+name);if(scr)scr.classList.add("active");const tab=document.getElementById("tab-"+name);if(tab)tab.classList.add("active");curScreen=name;}
@@ -267,7 +315,7 @@ function showPerson(i){
   document.getElementById("d-facts").innerHTML=fields.map(([k,v])=>"<div class=\"fr\"><div class=\"fk\">"+k+"</div><div class=\"fv\">"+v+"</div></div>").join("");
   document.getElementById("d-events").innerHTML=p.events.map(e=>"<div class=\"rem-card\"><div style=\"font-size:13px;font-weight:600;color:#1A1208\">"+p.name+"s "+e.name+" · "+e.date+"</div><div style=\"font-size:11px;color:#9B8B78;margin-top:2px\">"+e.days+" days away</div></div>").join("");
   document.getElementById("d-gifts").innerHTML=p.gifts.map(g=>"<div class=\"gi\"><div class=\"gdot\"></div><div style=\"font-size:12px;color:#1A1208\">"+g+"</div></div>").join("");
-  const allNotes=[...un[i],...p.defaultNotes];
+  const allNotes=[...(un[i]||[]),...p.defaultNotes];
   document.getElementById("d-notes").innerHTML=allNotes.length?allNotes.map(n=>"<div class=\"ni\"><div class=\"nd\">"+n.date+"</div><div class=\"nt\">"+n.text+"</div></div>").join(""):"<div style=\"font-size:12px;color:#9B8B78;padding:6px 0\">No notes yet. Add one!</div>";
   showScreen("detail");
 }
@@ -286,6 +334,17 @@ let voiceOn=false,vsec=0,vtick=null,wanim=null;
 function startVoice(e){if(e)e.preventDefault();voiceOn=true;vsec=0;document.getElementById("vbtn").style.background="#E24B4A";document.getElementById("vlbl").textContent="Recording…";vtick=setInterval(()=>{vsec++;const m=Math.floor(vsec/60),s=vsec%60;document.getElementById("vtimer").textContent=m+":"+(s<10?"0":"")+s;},1000);wanim=setInterval(()=>{document.querySelectorAll(".wbar").forEach(b=>{b.style.height=(Math.floor(Math.random()*44)+6)+"px";});},110);}
 function stopVoice(){if(!voiceOn)return;voiceOn=false;clearInterval(vtick);clearInterval(wanim);document.getElementById("vbtn").style.background="#C96A30";document.getElementById("vlbl").textContent="Voice note saved! +10 pts";document.querySelectorAll(".wbar").forEach(b=>b.style.height="8px");LS.addPoints(10);LS.touchStreak();refreshPoints();setTimeout(()=>{document.getElementById("vlbl").textContent="Hold the button to record";document.getElementById("vtimer").textContent="0:00";},2200);}
 function insertChip(t){const ta=document.getElementById("note-txt");if(ta){ta.value=(ta.value?ta.value+" ":"")+t+": ";ta.focus();}}
+let editGifts=[];
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function renderEditGifts(){document.getElementById('edit-gifts').innerHTML=editGifts.map((g,i)=>"<div class='gift-row'><input class='field-inp' style='flex:1;margin-right:6px' value='"+escHtml(g)+"' oninput='editGifts["+i+"]=this.value'><button class='gift-del' onclick='removeGift("+i+")'>&#10005;</button></div>").join('');}
+function addGiftInEdit(){editGifts.push('');renderEditGifts();}
+function removeGift(i){editGifts.splice(i,1);renderEditGifts();}
+function startEditPerson(i){currentPerson=i;const p=people[i];document.getElementById('edit-title').textContent='Edit '+p.name;document.getElementById('ef-name').value=p.name;document.getElementById('ef-rel').value=p.rel;document.getElementById('ef-bday').value=p.bday||'';document.getElementById('ef-ann').value=p.ann||'';document.getElementById('ef-job').value=p.job||'';document.getElementById('ef-loves').value=p.loves||'';document.getElementById('ef-dislikes').value=p.dislikes||'';editGifts=[...(p.gifts||[])];renderEditGifts();showScreen('editperson');}
+function saveEditPerson(){const nm=document.getElementById('ef-name').value.trim();const rl=document.getElementById('ef-rel').value.trim();if(!nm||!rl){toast('Name and relationship required');return;}const init=nm.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);people[currentPerson]={...people[currentPerson],name:nm,rel:rl,initials:init,bday:document.getElementById('ef-bday').value.trim()||null,ann:document.getElementById('ef-ann').value.trim()||null,job:document.getElementById('ef-job').value.trim()||'',loves:document.getElementById('ef-loves').value.trim()||'',dislikes:document.getElementById('ef-dislikes').value.trim()||'',gifts:editGifts.filter(g=>g.trim())};LS.savePeople(people);renderCircle();showPerson(currentPerson);toast('Profile updated!');}
+function cancelEdit(){showScreen('detail');}
+function submitAddPerson(){const nm=document.getElementById('af-name').value.trim();const rl=document.getElementById('af-rel').value.trim();if(!nm||!rl){toast('Name and relationship required');return;}const init=nm.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);const avcs=['av-1','av-2','av-3','av-4','av-5','av-6'];people.push({name:nm,rel:rl,initials:init,avc:avcs[people.length%avcs.length],bday:document.getElementById('af-bday').value.trim()||null,ann:document.getElementById('af-ann').value.trim()||null,job:document.getElementById('af-job').value.trim()||'',loves:document.getElementById('af-loves').value.trim()||'',dislikes:document.getElementById('af-dislikes').value.trim()||'',events:[],gifts:[],defaultNotes:[]});LS.savePeople(people);['af-name','af-rel','af-bday','af-ann','af-job','af-loves','af-dislikes'].forEach(id=>document.getElementById(id).value='');renderCircle();showScreen('people');toast(nm+' added! +15 pts');LS.addPoints(15);LS.touchStreak();refreshPoints();}
+function confirmDeletePerson(){if(confirm('Remove '+people[currentPerson].name+' from your circle?')){deletePerson(currentPerson);}}
+function deletePerson(i){const notes=LS.getNotes();notes.splice(i,1);LS.set('notes',notes);people.splice(i,1);LS.savePeople(people);renderCircle();showScreen('people');toast('Removed from circle');}
 let toastTimer=null;
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200);}
 function updateClock(){const now=new Date(),h=now.getHours(),m=now.getMinutes(),el=document.getElementById("clk");if(el)el.textContent=h+":"+(m<10?"0":"")+m;}
@@ -293,7 +352,7 @@ updateClock();setInterval(updateClock,60000);
 document.getElementById("chips").innerHTML=chips.map(c=>"<div onclick=\"insertChip('"+ c +"')\" style=\"background:#FAEEDA;border:0.5px solid rgba(201,106,48,0.25);border-radius:20px;padding:5px 10px;font-size:10px;font-weight:600;color:#854F0B;cursor:pointer\">"+ c+"</div>").join("");
 document.getElementById("e10").innerHTML=e10.map((item,i)=>"<div class=\"e10-item\"><div class=\"e10-num\">"+(i+1)+"</div><div style=\"font-size:12px;color:#1A1208;line-height:1.4\">"+item+"</div></div>").join("");
 
-refreshPoints();refreshBadges();refreshCheckin();refreshPeopleScreen();initQuiz();
+refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();
 </script>
 </body>
 </html>
