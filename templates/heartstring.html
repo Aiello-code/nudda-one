@@ -211,14 +211,18 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     </div>
   </div>
   <div class='content screen' id='screen-insights' style='padding-bottom:20px'>
-    <div class='ph'><div class='ptitle'>Insights</div><div class='psub'>Daily reflections &amp; prompts</div></div>
+    <div class='ph'><div class='ptitle'>Insights</div><div class='psub' id='ins-psub'>Daily reflections &amp; prompts</div></div>
+      <div id='ins-loading' style='padding:50px 20px;text-align:center;display:none'>
+    <div style='font-size:32px;margin-bottom:10px'>&#10024;</div>
+    <div style='font-size:13px;color:var(--text2)'>Thinking about your circle...</div>
+  </div>
+  <div id='ins-content'>
     <div class='slbl'>Today&#39;s reflection</div>
-    <div class='daily-card'><div class='dlbl'>About Emma</div><div class='dqt'>&#8220;Emma&#39;s been overwhelmed lately. What&#39;s one small thing you could do today to make her feel more supported?&#8221;</div></div>
-    <div class='slbl'>Suggested questions to ask</div>
-    <div class='card'><div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:9px'>FOR EMMA</div><div style='font-size:12px;color:#1A1208;line-height:2.1'>&bull; How has work been since the new deadline?<br>&bull; What&#39;s one thing that made you smile this week?<br>&bull; Have you thought more about the Japan trip?<br>&bull; Is there anything I can help with this weekend?</div></div>
-    <div class='card'><div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:9px'>FOR DAD</div><div style='font-size:12px;color:#1A1208;line-height:2.1'>&bull; How&#39;s the knee feeling after physio?<br>&bull; Did you finish this week&#39;s crossword?<br>&bull; Want to book a round of golf this month?</div></div>
-    <div class='card'><div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:9px'>FOR JAMIE</div><div style='font-size:12px;color:#1A1208;line-height:2.1'>&bull; How&#39;s marathon training going?<br>&bull; Any board game nights coming up?<br>&bull; What&#39;s the latest on the promotion?</div></div>
-    <div class='slbl'>The Essential 10</div><div class='card' id='e10'></div>
+    <div id='ins-reflection'><div class='daily-card'><div class='dlbl'>Loading...</div><div class='dqt'>&#8220;Your personalised insights will appear here.&#8221;</div></div></div>
+    <div class='slbl'>Suggested questions</div>
+    <div id='ins-questions'></div>
+  </div>
+  <div class='slbl'>The Essential 10</div><div class='card' id='e10'></div>
   </div>
   <div class='content screen' id='screen-addnote' style='padding-bottom:20px'>
     <div class='dh'><div class='bk' onclick="showScreen('home')">&#8592;</div><div style='font-size:15px;font-weight:600;color:#1A1208'>Quick Note</div></div>
@@ -333,7 +337,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     <div class='tab-item active' id='tab-home' onclick="showScreen('home')"><div class='tab-icon'>&#127968;</div><div class='tab-lbl'>Home</div></div>
     <div class='tab-item' id='tab-people' onclick="showScreen('people');renderCircle()"><div class='tab-icon'>&#128101;</div><div class='tab-lbl'>Circle</div></div>
     <div class='tab-item' id='tab-quiz' onclick="showScreen('quiz');initQuiz()"><div class='tab-icon'>&#129504;</div><div class='tab-lbl'>Quiz</div></div>
-    <div class='tab-item' id='tab-insights' onclick="showScreen('insights')"><div class='tab-icon'>&#128161;</div><div class='tab-lbl'>Insights</div></div>
+    <div class='tab-item' id='tab-insights' onclick="showScreen('insights');loadInsights()"><div class='tab-icon'>&#128161;</div><div class='tab-lbl'>Insights</div></div>
   </div>
 </div>
 
@@ -355,7 +359,7 @@ const allQs=[
 const e10=['Birthday and how they like to celebrate','Their biggest current worry or stressor','Their love language (gifts, words, quality time…)','Favourite food or restaurant','Main hobby or passion','Most important relationship in their life','Something they are currently working toward','A fond memory you share together','How they prefer to be supported when struggling','One thing that always makes them smile'];
 const chips=['Enjoyed a meal','Health update','Upcoming plan','Mood / feeling','Said something funny','Shared a memory'];
 const LS={
-  DEFAULTS:{people:null,points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
+  DEFAULTS:{people:null,insights:null,points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
   get(k){const r=localStorage.getItem('hs_'+k);return r!==null?JSON.parse(r):this.DEFAULTS[k];},
   set(k,v){localStorage.setItem('hs_'+k,JSON.stringify(v));},
   getPoints(){return this.get('points');},
@@ -369,7 +373,7 @@ const LS={
   getCheckin(){return this.get('checkin');},
   setCheckin(){this.set('checkin',{date:new Date().toDateString(),done:true});},
   getQuiz(){return this.get('quiz');},
-  addQuizResult(c,t){const q=this.getQuiz();q.total+=t;q.correct+=c;this.set('quiz',q);return q;},getPeople(){const r=this.get('people');return (r!==null&&r!==undefined)?r:JSON.parse(JSON.stringify(DEFAULT_PEOPLE));},savePeople(p){this.set('people',p);},getTheme(){return localStorage.getItem('hs_theme')||'warm';},setTheme(t){localStorage.setItem('hs_theme',t);}
+  addQuizResult(c,t){const q=this.getQuiz();q.total+=t;q.correct+=c;this.set('quiz',q);return q;},getPeople(){const r=this.get('people');return (r!==null&&r!==undefined)?r:JSON.parse(JSON.stringify(DEFAULT_PEOPLE));},savePeople(p){this.set('people',p);},getInsights(){return this.get('insights');},setInsights(d){this.set('insights',d);},getTheme(){return localStorage.getItem('hs_theme')||'warm';},setTheme(t){localStorage.setItem('hs_theme',t);}
 };
 const LEVELS=[{min:0,max:99,level:1,title:"Getting Started",next:100},{min:100,max:249,level:2,title:"Caring Friend",next:250},{min:250,max:499,level:3,title:"Thoughtful Friend",next:500},{min:500,max:899,level:4,title:"Devoted Friend",next:900},{min:900,max:Infinity,level:5,title:"Heartstring Pro",next:null}];
 function getLevel(pts){return LEVELS.find(l=>pts>=l.min&&pts<=l.max)||LEVELS[LEVELS.length-1];}
@@ -495,6 +499,39 @@ async function analyzeNote(pi,text){
     }
   }catch(e){}
 }
+function renderInsights(data){
+  const rDiv=document.getElementById('ins-reflection');
+  const qDiv=document.getElementById('ins-questions');
+  const psub=document.getElementById('ins-psub');
+  if(!data||!data.reflection){
+    if(rDiv)rDiv.innerHTML="<div class='daily-card'><div class='dlbl'>Reflection</div><div class='dqt'>&#8220;Think about the last meaningful conversation you had. What made it special?&#8221;</div></div>";
+    if(qDiv)qDiv.innerHTML='';
+    return;
+  }
+  if(rDiv)rDiv.innerHTML="<div class='daily-card'><div class='dlbl'>About "+escHtml(data.reflection.person)+"</div><div class='dqt'>&#8220;"+escHtml(data.reflection.text)+"&#8221;</div></div>";
+  if(qDiv)qDiv.innerHTML=(data.questions||[]).map(q=>
+    "<div class='card'><div style='font-size:10px;font-weight:700;color:var(--text2);margin-bottom:9px'>FOR "+escHtml(q.person.toUpperCase())+"</div><div style='font-size:12px;color:var(--text);line-height:2.1'>"+
+    q.items.map(it=>'&bull; '+escHtml(it)).join('<br>')+"</div></div>"
+  ).join('');
+  if(psub&&data.ts){const h=Math.floor((Date.now()-data.ts)/3600000);psub.textContent=h<1?'Just updated':`Updated ${h}h ago`;}
+}
+async function loadInsights(force){
+  const cached=LS.getInsights();
+  if(!force&&cached&&cached.ts&&(Date.now()-cached.ts)<43200000){renderInsights(cached);return;}
+  const ld=document.getElementById('ins-loading');
+  const ic=document.getElementById('ins-content');
+  if(ld)ld.style.display='block';
+  if(ic)ic.style.display='none';
+  try{
+    const notes=LS.getNotes();
+    const pd=people.map((p,i)=>({...p,recentNotes:[...(notes[i]||[]).slice(0,3),...p.defaultNotes.slice(0,2)]}));
+    const res=await fetch('/api/generate-insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({people:pd})});
+    const data=await res.json();
+    if(data.reflection){data.ts=Date.now();LS.setInsights(data);renderInsights(data);}
+    else{renderInsights(cached);}
+  }catch(e){renderInsights(cached);}
+  finally{if(ld)ld.style.display='none';if(ic)ic.style.display='block';}
+}
 let toastTimer=null;
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200);}
 function updateClock(){const now=new Date(),h=now.getHours(),m=now.getMinutes(),el=document.getElementById("clk");if(el)el.textContent=h+":"+(m<10?"0":"")+m;}
@@ -502,7 +539,7 @@ updateClock();setInterval(updateClock,60000);
 document.getElementById("chips").innerHTML=chips.map(c=>"<div onclick=\"insertChip('"+ c +"')\" style=\"background:#FAEEDA;border:0.5px solid rgba(201,106,48,0.25);border-radius:20px;padding:5px 10px;font-size:10px;font-weight:600;color:#854F0B;cursor:pointer\">"+ c+"</div>").join("");
 document.getElementById("e10").innerHTML=e10.map((item,i)=>"<div class=\"e10-item\"><div class=\"e10-num\">"+(i+1)+"</div><div style=\"font-size:12px;color:#1A1208;line-height:1.4\">"+item+"</div></div>").join("");
 
-refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());
+refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());const _ci=LS.getInsights();if(_ci)renderInsights(_ci);
 </script>
 </body>
 </html>
