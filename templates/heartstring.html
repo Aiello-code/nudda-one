@@ -108,6 +108,13 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
 .phone.theme-ocean [style*='background:#E6F1FB']{background:var(--accent-light)!important}
 .phone.theme-midnight .qopt.wrong{background:#3E1A1A!important;border-color:#8B3A3A!important;color:#F8B4B4!important}
 .phone.theme-midnight .qopt.correct{background:#1A3A22!important;border-color:#3A7A4A!important;color:#9AF0B2!important}
+#ai-suggest{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:390px;background:var(--card);border:1.5px solid var(--accent);border-radius:16px;padding:13px 15px;z-index:150;box-shadow:0 4px 24px rgba(0,0,0,0.13);display:none;animation:slideup 0.22s ease}
+#ai-suggest.show{display:block}
+@keyframes slideup{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.ai-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ai-btns{display:flex;gap:7px;flex-shrink:0}
+.ai-apply{background:var(--accent);color:#FFF;border:none;border-radius:9px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.ai-dismiss{background:transparent;border:0.5px solid var(--border);color:var(--text2);border-radius:9px;padding:7px 11px;font-size:12px;cursor:pointer;font-family:inherit}
 </style>
 </head>
 <body>
@@ -311,6 +318,16 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     </div>
   </div>
 </div>
+<div id='ai-suggest'>
+  <div style='font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.6px;margin-bottom:6px'>&#129504; AI SUGGESTION</div>
+  <div class='ai-row'>
+    <div id='ai-msg' style='font-size:13px;color:var(--text);line-height:1.4;flex:1'></div>
+    <div class='ai-btns'>
+      <button class='ai-apply' onclick='applyAISuggestion()'>Apply</button>
+      <button class='ai-dismiss' onclick='dismissAI()'>&#10005;</button>
+    </div>
+  </div>
+</div>
 <div class='toast' id='toast'></div>
   <div class='tab-bar'>
     <div class='tab-item active' id='tab-home' onclick="showScreen('home')"><div class='tab-icon'>&#127968;</div><div class='tab-lbl'>Home</div></div>
@@ -410,7 +427,7 @@ function nextQ(){curQ++;loadQ();}
 function endQuiz(){document.getElementById("q-card").style.display="none";document.getElementById("q-done").style.display="block";document.getElementById("q-res").textContent="You scored "+qScore+" out of "+qList.length;const ep=qScore*10;document.getElementById("q-pts").textContent="+"+ep+" pts";LS.addQuizResult(qScore,qList.length);LS.addPoints(ep);LS.touchStreak();if(qScore===qList.length)LS.addBadge("🏆 Perfect Score");refreshPoints();refreshBadges();toast("Quiz done! +"+ep+" pts");qList=[...allQs];}
 function checkIn(btn){btn.style.background="#4A7C59";btn.style.color="#FFF";btn.textContent="Checked in ✓";btn.disabled=true;const s=document.querySelector("#checkin-btns button:last-child");if(s)s.disabled=true;LS.setCheckin();LS.addPoints(10);LS.touchStreak();refreshPoints();toast("Great! +10 pts added");}
 function remindLater(btn){btn.textContent="Reminder set ⏰";btn.disabled=true;}
-function saveNote(){const ta=document.getElementById("note-txt");const pi=parseInt(document.getElementById("note-who").value);const text=ta.value.trim();if(!text){toast("Write something first!");return;}LS.addNote(pi,text);LS.addPoints(5);LS.touchStreak();if(LS.getNotes().flat().length>=5)LS.addBadge("📝 Note Taker");refreshPoints();refreshBadges();ta.value="";showScreen("home");toast("Note saved! +5 pts");}
+function saveNote(){const ta=document.getElementById("note-txt");const pi=parseInt(document.getElementById("note-who").value);const text=ta.value.trim();if(!text){toast("Write something first!");return;}LS.addNote(pi,text);LS.addPoints(5);LS.touchStreak();if(LS.getNotes().flat().length>=5)LS.addBadge("📝 Note Taker");refreshPoints();refreshBadges();const savedText=text;const savedPi=pi;ta.value="";showScreen("home");toast("Note saved! +5 pts");analyzeNote(savedPi,savedText);}
 let voiceOn=false,vsec=0,vtick=null,wanim=null;
 function startVoice(e){if(e)e.preventDefault();voiceOn=true;vsec=0;document.getElementById("vbtn").style.background="#E24B4A";document.getElementById("vlbl").textContent="Recording…";vtick=setInterval(()=>{vsec++;const m=Math.floor(vsec/60),s=vsec%60;document.getElementById("vtimer").textContent=m+":"+(s<10?"0":"")+s;},1000);wanim=setInterval(()=>{document.querySelectorAll(".wbar").forEach(b=>{b.style.height=(Math.floor(Math.random()*44)+6)+"px";});},110);}
 function stopVoice(){if(!voiceOn)return;voiceOn=false;clearInterval(vtick);clearInterval(wanim);document.getElementById("vbtn").style.background="#C96A30";document.getElementById("vlbl").textContent="Voice note saved! +10 pts";document.querySelectorAll(".wbar").forEach(b=>b.style.height="8px");LS.addPoints(10);LS.touchStreak();refreshPoints();setTimeout(()=>{document.getElementById("vlbl").textContent="Hold the button to record";document.getElementById("vtimer").textContent="0:00";},2200);}
@@ -440,6 +457,43 @@ function applyTheme(name){
     const chk=document.getElementById('chk-'+t);
     if(chk)chk.style.display=t===name?'block':'none';
   });
+}
+let aiPending=null;
+function dismissAI(){document.getElementById('ai-suggest').classList.remove('show');aiPending=null;}
+function applyAISuggestion(){
+  if(!aiPending)return;
+  const {pi,field,value}=aiPending;
+  const p=people[pi];
+  if(field==='loves'||field==='dislikes'){
+    const cur=p[field]||'';
+    p[field]=cur?cur+', '+value:value;
+  } else {
+    p[field]=value;
+  }
+  p.initials=p.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  LS.savePeople(people);
+  renderCircle();
+  dismissAI();
+  toast('Profile updated!');
+}
+function showAISuggestion(pi,field,value,summary){
+  aiPending={pi,field,value};
+  document.getElementById('ai-msg').textContent='Update '+people[pi].name+"'s "+field+' to “'+value+'”?';
+  document.getElementById('ai-suggest').classList.add('show');
+}
+async function analyzeNote(pi,text){
+  try{
+    const p=people[pi];
+    const res=await fetch('/api/analyze-note',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({note:text,person:{name:p.name,rel:p.rel,job:p.job,loves:p.loves,dislikes:p.dislikes,bday:p.bday}})
+    });
+    const data=await res.json();
+    if(data.field&&data.value){
+      showAISuggestion(pi,data.field,data.value,data.summary);
+    }
+  }catch(e){}
 }
 let toastTimer=null;
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200);}
