@@ -126,19 +126,19 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
       <div style='display:flex;justify-content:space-between;align-items:flex-start'>
         <div>
           <div style='font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:3px'>&#128293; Current streak</div>
-          <div class='snum' id='streak-num'>7</div>
+          <div class='snum' id='streak-num'>0</div>
           <div style='font-size:11px;color:rgba(255,255,255,0.75)'>days in a row</div>
-          <div style='font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px' id='pts-line'>340 pts &middot; Thoughtful Friend</div>
+          <div style='font-size:10px;color:rgba(255,255,255,0.6);margin-top:3px' id='pts-line'></div>
         </div>
         <div style='text-align:right'>
-          <div style='font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:4px' id='level-lbl'>LEVEL 3</div>
+          <div style='font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:4px' id='level-lbl'></div>
           <div style='font-size:26px'>&#127919;</div>
         </div>
       </div>
-      <div class='pbar'><div class='pfill' id='pts-bar' style='width:70%'></div></div>
+      <div class='pbar'><div class='pfill' id='pts-bar' style='width:0%'></div></div>
       <div style='display:flex;justify-content:space-between;margin-top:5px'>
-        <div style='font-size:9px;color:rgba(255,255,255,0.6)' id='pts-prog'>340 / 500 pts to Level 4</div>
-        <div style='font-size:9px;color:rgba(255,255,255,0.6)' id='pts-pct'>70%</div>
+        <div style='font-size:9px;color:rgba(255,255,255,0.6)' id='pts-prog'></div>
+        <div style='font-size:9px;color:rgba(255,255,255,0.6)' id='pts-pct'></div>
       </div>
     </div>
     <div class='slbl'>Upcoming events</div><div id='home-events'></div>
@@ -208,7 +208,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
   </div>
   <div id='ins-content' style='display:none'>
     <div class='slbl'>Today&#39;s reflection</div>
-    <div id='ins-reflection'><div class='daily-card'><div class='dlbl'>Loading...</div><div class='dqt'>&#8220;Your personalised insights will appear here.&#8221;</div></div></div>
+    <div id='ins-reflection'><div class='daily-card'><div class='dlbl'>Loading...</div></div></div>
     <div class='slbl'>Suggested questions</div>
     <div id='ins-questions'></div>
   </div>
@@ -476,7 +476,7 @@ function deleteNote(pi,ni){
   showPerson(pi);
   toast('Note deleted');
 }
-async async function analyzeNoteFromDetail(pi,text){
+async function analyzeNoteFromDetail(pi,text){
   if(_aiLock){toast('Analysis already running…');return;}
   if(!LS.canUseAI('notes',NOTE_LIMIT)){toast('Daily AI limit reached — resets tomorrow');return;}
   const rem=LS.aiRemaining('notes',NOTE_LIMIT)-1;
