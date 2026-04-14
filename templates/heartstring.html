@@ -201,7 +201,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     </div>
   </div>
   <div class='content screen' id='screen-insights' style='padding-bottom:20px'>
-    <div class='ph'><div class='ptitle'>Insights</div><div class='psub' id='ins-psub'>Daily reflections &amp; prompts</div></div>
+    <div class='ph' style='display:flex;justify-content:space-between;align-items:center'><div><div class='ptitle'>Insights</div><div class='psub' id='ins-psub'>Daily reflections &amp; prompts</div></div><button id='ins-refresh-btn' onclick='loadInsights(true)' style='background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;font-family:inherit'>↻ Refresh</button></div>
       <div id='ins-loading' style='padding:50px 20px;text-align:center;display:none'>
     <div style='font-size:32px;margin-bottom:10px'>&#10024;</div>
     <div style='font-size:13px;color:var(--text2)'>Thinking about your circle...</div>
@@ -399,7 +399,11 @@ const LS={
   getStreak(){return this.get('streak');},
   touchStreak(){const today=new Date().toDateString();const s=this.getStreak();if(s.lastDate===today)return s;const yest=new Date(Date.now()-86400000).toDateString();s.count=(s.lastDate===yest)?s.count+1:1;s.lastDate=today;this.set('streak',s);return s;},
   getNotes(){return this.get('notes');},
-  addNote(pi,text,type){const notes=this.getNotes();if(!notes[pi])notes[pi]=[];const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const entry={date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text};if(type)entry.type=type;notes[pi].unshift(entry);this.set('notes',notes);return notes;},getUserName(){return this.get('userName')||'';},setUserName(n){this.set('userName',n);},getLastContact(){return this.get('lastContact')||{};},setLastContact(pi){const lc=this.getLastContact();lc[pi]=new Date().toISOString();this.set('lastContact',lc);},isFirstRun(){return this.get('firstRun')!==false;},completeFirstRun(){this.set('firstRun',false);},snoozeCheckin(){const ci=this.getCheckin();ci.snoozeUntil=Date.now()+7200000;this.set('checkin',ci);},setCheckinNote(ref){const ci=this.getCheckin();ci.noteRef=ref;this.set('checkin',ci);},
+  addNote(pi,text,type){const notes=this.getNotes();if(!notes[pi])notes[pi]=[];const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const entry={date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text};if(type)entry.type=type;notes[pi].unshift(entry);this.set('notes',notes);return notes;},getUserName(){return this.get('userName')||'';},setUserName(n){this.set('userName',n);},getLastContact(){return this.get('lastContact')||{};},setLastContact(pi){const lc=this.getLastContact();lc[pi]=new Date().toISOString();this.set('lastContact',lc);},isFirstRun(){return this.get('firstRun')!==false;},completeFirstRun(){this.set('firstRun',false);},
+  getAIBudget(){const b=this.get('aiBudget');const today=new Date().toDateString();if(!b||b.date!==today)return{date:today,notes:0,insights:0};return b;},
+  useAI(type){const b=this.getAIBudget();b[type]=(b[type]||0)+1;this.set('aiBudget',b);},
+  canUseAI(type,limit){return(this.getAIBudget()[type]||0)<limit;},
+  aiRemaining(type,limit){return Math.max(0,limit-(this.getAIBudget()[type]||0));},snoozeCheckin(){const ci=this.getCheckin();ci.snoozeUntil=Date.now()+7200000;this.set('checkin',ci);},setCheckinNote(ref){const ci=this.getCheckin();ci.noteRef=ref;this.set('checkin',ci);},
   getBadges(){return this.get('badges');},
   addBadge(b){const badges=this.getBadges();if(!badges.includes(b)){badges.push(b);this.set('badges',badges);}return badges;},
   getCheckin(){return this.get('checkin');},
@@ -472,8 +476,11 @@ function deleteNote(pi,ni){
   showPerson(pi);
   toast('Note deleted');
 }
-async function analyzeNoteFromDetail(pi,text){
-  toast('Analysing note…');
+async async function analyzeNoteFromDetail(pi,text){
+  if(_aiLock){toast('Analysis already running…');return;}
+  if(!LS.canUseAI('notes',NOTE_LIMIT)){toast('Daily AI limit reached — resets tomorrow');return;}
+  const rem=LS.aiRemaining('notes',NOTE_LIMIT)-1;
+  toast('Analysing note…'+(rem<=5?' ('+rem+' left today)':''));
   await analyzeNote(pi,text);
 }
 function showPerson(i){
@@ -548,7 +555,7 @@ function applyTheme(name){
     if(chk)chk.style.display=t===name?'block':'none';
   });
 }
-let aiQueue=[];
+let aiQueue=[];let _aiLock=false;
 function dismissAI(){aiQueue.shift();if(aiQueue.length>0){_showNextAI();}else{document.getElementById('ai-suggest').classList.remove('show');}}
 function applyAISuggestion(){
   if(!aiQueue.length)return;
@@ -576,7 +583,15 @@ function showAISuggestion(pi,field,value,summary){if(!people[pi])return;
   aiQueue.push({pi,field,value});
   if(aiQueue.length===1){_showNextAI();document.getElementById('ai-suggest').classList.add('show');}
 }
-async function analyzeNote(pi,text){
+const NOTE_LIMIT=20;
+async function analyzeNote(pi,text,silent){
+  if(_aiLock)return;
+  if(!LS.canUseAI('notes',NOTE_LIMIT)){
+    if(!silent)toast('Daily AI limit reached (’resets tomorrow)');
+    return;
+  }
+  _aiLock=true;
+  LS.useAI('notes');
   try{
     const p=people[pi];
     if(!p)return;
@@ -589,6 +604,7 @@ async function analyzeNote(pi,text){
     const updates=data.updates||[];
     updates.forEach(u=>{if(u.field&&u.value)showAISuggestion(pi,u.field,u.value,u.summary||'');});
   }catch(e){}
+  finally{_aiLock=false;}
 }
 function renderInsights(data){
   const rDiv=document.getElementById('ins-reflection');
@@ -612,19 +628,36 @@ function renderInsights(data){
   }
   if(psub&&data.ts){var h=Math.floor((Date.now()-data.ts)/3600000);psub.textContent=h<1?'Just updated':'Updated '+h+'h ago';}
 }
+const INSIGHT_LIMIT=3;const INSIGHT_COOLDOWN=3600000;
 async function loadInsights(force){
   const ld=document.getElementById('ins-loading');
   const ic=document.getElementById('ins-content');
+  const rb=document.getElementById('ins-refresh-btn');
   const cached=LS.getInsights();
-  const isStale=!cached||!cached.ts||(Date.now()-cached.ts)>=43200000;
+  const age=cached&&cached.ts?Date.now()-cached.ts:Infinity;
+  const isStale=age>=43200000;
+  if(force){
+    if(!LS.canUseAI('insights',INSIGHT_LIMIT)){
+      toast('Insight refresh limit reached ('+INSIGHT_LIMIT+'/day) — resets tomorrow');
+      return;
+    }
+    if(age<INSIGHT_COOLDOWN){
+      const minsLeft=Math.ceil((INSIGHT_COOLDOWN-age)/60000);
+      toast('Insights refreshed recently — try again in '+minsLeft+' min');
+      return;
+    }
+    LS.useAI('insights');
+  }
   if(!force&&!isStale){
     if(ld)ld.style.display='none';
     if(ic)ic.style.display='block';
     renderInsights(cached);
+    _updateRefreshBtn();
     return;
   }
   if(ld)ld.style.display='block';
   if(ic)ic.style.display='none';
+  if(rb)rb.disabled=true;
   try{
     const notes=LS.getNotes();
     const pd=people.map((p,i)=>({...p,recentNotes:[...(notes[i]||[]).slice(0,3),...p.defaultNotes.slice(0,2)]}));
@@ -633,7 +666,22 @@ async function loadInsights(force){
     if(data&&data.reflection){data.ts=Date.now();LS.setInsights(data);renderInsights(data);}
     else{if(cached)renderInsights(cached);}
   }catch(e){if(cached)renderInsights(cached);}
-  finally{if(ld)ld.style.display='none';if(ic)ic.style.display='block';}
+  finally{
+    if(ld)ld.style.display='none';
+    if(ic)ic.style.display='block';
+    _updateRefreshBtn();
+  }
+}
+function _updateRefreshBtn(){
+  const rb=document.getElementById('ins-refresh-btn');
+  if(!rb)return;
+  const rem=LS.aiRemaining('insights',INSIGHT_LIMIT);
+  const cached=LS.getInsights();
+  const age=cached&&cached.ts?Date.now()-cached.ts:Infinity;
+  const onCooldown=age<INSIGHT_COOLDOWN;
+  rb.disabled=(rem===0||onCooldown);
+  rb.title=rem===0?'Limit reached ('+INSIGHT_LIMIT+'/day)':onCooldown?'On cooldown':'Refresh AI insights ('+rem+' left today)';
+  rb.textContent='↻ Refresh'+(rem<INSIGHT_LIMIT?' ('+rem+'/'+INSIGHT_LIMIT+')':'');
 }
 let toastTimer=null;
 function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200);}
@@ -678,7 +726,7 @@ function checkFirstRun(){
     if(ov)ov.style.display='flex';
   }
 }
-refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());const _ci=LS.getInsights();if(_ci)renderInsights(_ci);refreshGreeting();refreshHomeEvents();refreshVoiceWho();refreshVoiceRecent();initSettingsName();checkFirstRun();
+refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());const _ci=LS.getInsights();if(_ci)renderInsights(_ci);refreshGreeting();refreshHomeEvents();refreshVoiceWho();refreshVoiceRecent();initSettingsName();checkFirstRun();_updateRefreshBtn();
 </script>
 </body>
 </html>
