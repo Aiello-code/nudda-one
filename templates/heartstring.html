@@ -166,8 +166,8 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     <div class='stat-grid'>
       <div class='stat-card'><div class='stat-l'>Total notes</div><div class='stat-n' id='stat-notes'>27</div></div>
       <div class='stat-card'><div class='stat-l'>Quiz accuracy</div><div class='stat-n' id='stat-quiz'>&#8212;</div></div>
-      <div class='stat-card'><div class='stat-l'>Events tracked</div><div class='stat-n'>6</div></div>
-      <div class='stat-card'><div class='stat-l'>Gift ideas</div><div class='stat-n'>9</div></div>
+      <div class='stat-card'><div class='stat-l'>Events tracked</div><div class='stat-n' id='stat-events'>0</div></div>
+      <div class='stat-card'><div class='stat-l'>Gift ideas</div><div class='stat-n' id='stat-gifts'>0</div></div>
     </div>
     <div style='height:20px'></div>
   </div>
@@ -193,7 +193,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     <div id='q-done' style='display:none'>
       <div class='card' style='text-align:center;padding:26px'>
         <div style='font-size:38px;margin-bottom:8px'>&#127881;</div>
-        <div style='font-size:19px;font-weight:700;color:#1A1208;font-family:Georgia,serif;margin-bottom:4px'>Quiz complete!</div>
+        <div style='font-size:19px;font-weight:700;color:var(--text);font-family:Georgia,serif;margin-bottom:4px'>Quiz complete!</div>
         <div style='font-size:13px;color:#9B8B78;margin-bottom:14px' id='q-res'>You scored 0 / 7</div>
         <div style='background:#FAEEDA;border-radius:11px;padding:13px;margin-bottom:14px'><div style='font-size:22px;font-weight:700;color:#C96A30;font-family:Georgia,serif' id='q-pts'>+0 pts</div><div style='font-size:11px;color:#854F0B'>added to your total</div></div>
         <button onclick='initQuiz()' style='width:100%;background:#C96A30;color:#FFF;border:none;border-radius:12px;padding:12px;font-size:13px;cursor:pointer;font-family:inherit;font-weight:600'>Try again</button>
@@ -352,15 +352,26 @@ const DEFAULT_PEOPLE=[
   {name:'Dad',rel:'Parent',initials:'DA',avc:'av-2',bday:'3 November 1958',ann:null,job:'Retired electrician',loves:'Golf, crosswords, 60s music',dislikes:'Spicy food, technology',events:[{name:'Birthday',date:'Nov 3, 2026',days:205}],gifts:['Golf lesson voucher','Times crossword collection','Beatles vinyl record'],defaultNotes:[{date:'8 Apr 2026',text:'Knee bothering him again — physio next week'},{date:'15 Mar 2026',text:'Proud of completing the crossword 3 days running'}]},
   {name:'Jamie',rel:'Best Friend',initials:'JA',avc:'av-3',bday:'22 July 1991',ann:null,job:'Software engineer',loves:'Board games, specialty coffee, cycling',dislikes:'Crowds, slow Wi-Fi',events:[{name:'Birthday',date:'Jul 22, 2026',days:101}],gifts:['Running shoes gift card','Board game expansion pack','Coffee subscription box'],defaultNotes:[{date:'11 Apr 2026',text:'Just started marathon training — first big race'},{date:'1 Apr 2026',text:'Stressed about work promotion, reviewed in May'}]}
 ];
-const allQs=[
-  {pi:0,q:"What is Emma's current job?",opts:['Nurse','Graphic Designer','Teacher','Lawyer'],ans:1},
-  {pi:0,q:'What cuisine did Emma recently enjoy?',opts:['Italian','Japanese','Thai','Mexican'],ans:2},
-  {pi:0,q:"What is Emma's dream travel destination?",opts:['Italy','Japan','New Zealand','Iceland'],ans:1},
-  {pi:1,q:'What hobby does Dad love most?',opts:['Tennis','Golf','Fishing','Chess'],ans:1},
-  {pi:1,q:'What music era does Dad enjoy?',opts:['80s','70s','60s','50s'],ans:2},
-  {pi:2,q:'What is Jamie currently training for?',opts:['Triathlon','Swim meet','Marathon','Cycling race'],ans:2},
-  {pi:2,q:'What does Jamie love doing in free time?',opts:['Video games','Board games','Hiking','Cooking'],ans:1}
-];
+function _shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+function _distract(correct,pool,fallback,n){const f=pool.filter(x=>x&&x!==correct);const r=_shuffle(f).slice(0,n);const fb=fallback.filter(x=>x&&x!==correct);let fi=0;while(r.length<n&&fi<fb.length)r.push(fb[fi++]);return r.slice(0,n);}
+function generateQuizQuestions(){
+  const JOBS=['Teacher','Nurse','Engineer','Accountant','Chef','Lawyer','Doctor','Architect','Photographer','Journalist'];
+  const LOVES=['Reading','Gaming','Cooking','Travelling','Running','Painting','Yoga','Surfing','Cycling','Dancing'];
+  const DISLIKES=['Spicy food','Loud music','Queuing','Horror movies','Early mornings','Cold weather','Crowds'];
+  const notes=LS.getNotes();const qs=[];
+  people.forEach((p,pi)=>{
+    const otherJobs=people.filter((_,i)=>i!==pi).map(_=>_.job).filter(Boolean);
+    const otherLoves=people.filter((_,i)=>i!==pi).flatMap(_=>(_.loves||'').split(/,\s*/).slice(0,2)).filter(Boolean);
+    const otherDislikes=people.filter((_,i)=>i!==pi).flatMap(_=>(_.dislikes||'').split(/,\s*/).slice(0,2)).filter(Boolean);
+    if(p.job){const dis=_distract(p.job,[...otherJobs],JOBS,3);const opts=_shuffle([p.job,...dis]);qs.push({pi,q:"What is "+p.name+"'s job?",opts,ans:opts.indexOf(p.job)});}
+    if(p.bday){const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];const bd=new Date(p.bday);const bdM=isNaN(bd)?null:MONTHS[bd.getMonth()];if(bdM){const dis=_distract(bdM,MONTHS,MONTHS,3);const opts=_shuffle([bdM,...dis]);qs.push({pi,q:"Which month is "+p.name+"'s birthday?",opts,ans:opts.indexOf(bdM)});}}
+    if(p.loves){const main=p.loves.split(/,\s*/)[0].trim();if(main){const dis=_distract(main,[...otherLoves,...LOVES],LOVES,3);const opts=_shuffle([main,...dis]);qs.push({pi,q:"What does "+p.name+" love most?",opts,ans:opts.indexOf(main)});}}
+    if(p.dislikes){const main=p.dislikes.split(/,\s*/)[0].trim();if(main){const dis=_distract(main,[...otherDislikes,...DISLIKES],DISLIKES,3);const opts=_shuffle([main,...dis]);qs.push({pi,q:"What does "+p.name+" dislike?",opts,ans:opts.indexOf(main)});}}
+    const allN=[...(notes[pi]||[]),...(p.defaultNotes||[])];
+    if(allN.length>0){const real=allN[0].text;const truncR=real.length>55?real.slice(0,55)+'…':real;const fakes=people.filter((_,i)=>i!==pi).flatMap((_,ix)=>[...(notes[ix]||[]),..._.defaultNotes]).map(n=>n.text).filter(Boolean);if(fakes.length>=1){const fake=fakes[Math.floor(Math.random()*fakes.length)];const truncF=fake.length>55?fake.slice(0,55)+'…':fake;const opts=_shuffle([truncR,truncF]);qs.push({pi,q:"Which of these did "+p.name+" actually say?",opts,ans:opts.indexOf(truncR)});}}
+  });
+  return _shuffle(qs);
+}
 const e10=['Birthday and how they like to celebrate','Their biggest current worry or stressor','Their love language (gifts, words, quality time…)','Favourite food or restaurant','Main hobby or passion','Most important relationship in their life','Something they are currently working toward','A fond memory you share together','How they prefer to be supported when struggling','One thing that always makes them smile'];
 const chips=['Enjoyed a meal','Health update','Upcoming plan','Mood / feeling','Said something funny','Shared a memory'];
 const LS={
@@ -420,7 +431,7 @@ function refreshPeopleScreen(){
   const q=LS.getQuiz();
   const n=LS.getNotes();
   document.getElementById('stat-notes').textContent=people.reduce((s,p,i)=>s+p.defaultNotes.length+(n[i]||[]).length,0);
-  document.getElementById('stat-quiz').textContent=q.total>0?Math.round((q.correct/q.total)*100)+'%':'—';
+  document.getElementById('stat-quiz').textContent=q.total>0?Math.round((q.correct/q.total)*100)+'%':'—';document.getElementById('stat-events').textContent=people.reduce((s,p)=>s+(p.events||[]).length,0);document.getElementById('stat-gifts').textContent=people.reduce((s,p)=>s+(p.gifts||[]).length,0);
   document.getElementById('circle-sub').textContent=people.length+' of '+people.length+' people added';
 }
 function renderCircle(){
@@ -451,10 +462,10 @@ async function analyzeNoteFromDetail(pi,text){
 function showPerson(i){
   currentPerson=i;const p=people[i],un=LS.getNotes();
   document.getElementById("d-av").textContent=p.initials;document.getElementById("d-av").className="dav "+p.avc;document.getElementById("d-nm").textContent=p.name;document.getElementById("d-rl").textContent=p.rel;
-  const fields=[p.ann?["Anniversary",p.ann]:null,["Birthday",p.bday],["Job",p.job],["Loves",p.loves],["Dislikes",p.dislikes]].filter(Boolean);
-  document.getElementById("d-facts").innerHTML=fields.map(([k,v])=>"<div class=\"fr\"><div class=\"fk\">"+k+"</div><div class=\"fv\">"+v+"</div></div>").join("");
-  document.getElementById("d-events").innerHTML=p.events.map(e=>"<div class=\"rem-card\"><div style=\"font-size:13px;font-weight:600;color:#1A1208\">"+p.name+"s "+e.name+" · "+e.date+"</div><div style=\"font-size:11px;color:#9B8B78;margin-top:2px\">"+e.days+" days away</div></div>").join("");
-  document.getElementById("d-gifts").innerHTML=p.gifts.map(g=>"<div class=\"gi\"><div class=\"gdot\"></div><div style=\"font-size:12px;color:#1A1208\">"+g+"</div></div>").join("");
+  const fields=[p.ann?["Anniversary",p.ann]:null,p.bday?["Birthday",p.bday]:null,p.job?["Job",p.job]:null,p.loves?["Loves",p.loves]:null,p.dislikes?["Dislikes",p.dislikes]:null].filter(f=>f&&f[1]);
+  document.getElementById("d-facts").innerHTML=fields.length?fields.map(([k,v])=>"<div class=\"fr\"><div class=\"fk\">"+escHtml(k)+"</div><div class=\"fv\">"+escHtml(String(v))+"</div></div>").join(""):"<div style=\"font-size:12px;color:var(--text2);padding:4px 0\">No profile info yet. Tap Edit to add some.</div>";
+  document.getElementById("d-events").innerHTML=(()=>{const today=new Date();return p.events.map(e=>{const d=new Date(e.date);const nx=new Date(today.getFullYear(),d.getMonth(),d.getDate());if(nx<today)nx.setFullYear(today.getFullYear()+1);const days=Math.ceil((nx-today)/86400000);const hint=days===0?'Today!':days===1?'Tomorrow!':days+' days away';return "<div class=\"rem-card\"><div style=\"font-size:13px;font-weight:600;color:var(--text)\">"+escHtml(p.name)+"'s "+escHtml(e.name)+" · "+escHtml(e.date.replace(/,\\s*\\d{4}/,''))+"</div><div class=\"theme-tdesc\">"+hint+(p.gifts.length?" · "+p.gifts.length+" gift idea"+(p.gifts.length>1?"s":""):"")+"</div></div>";}).join('');})();
+  document.getElementById("d-gifts").innerHTML=p.gifts.length?p.gifts.map(g=>"<div class=\"gi\"><div class=\"gdot\"></div><div style=\"font-size:12px;color:var(--text)\">"+escHtml(g)+"</div></div>").join(""):"<div style=\"font-size:12px;color:var(--text2);padding:4px 0\">No gift ideas yet. Edit profile to add some.</div>";
   const userNotes=(un[i]||[]);
   const defNotes=p.defaultNotes||[];
   function _noteRow(n,ni,isUser){
@@ -468,8 +479,8 @@ function showPerson(i){
 }
 
 let curQ=0,qScore=0,qAns=0,qList=[];
-function filterQuiz(pi){qList=allQs.filter(q=>q.pi===pi);}
-function initQuiz(){if(!qList.length)qList=[...allQs];curQ=0;qScore=0;qAns=0;document.getElementById("q-score").textContent="0 / 0";document.getElementById("q-bonus").textContent="+0 pts";document.getElementById("q-done").style.display="none";document.getElementById("q-card").style.display="block";loadQ();}
+function filterQuiz(pi){qList=generateQuizQuestions().filter(q=>q.pi===pi);}
+function initQuiz(){qList=generateQuizQuestions();curQ=0;qScore=0;qAns=0;document.getElementById("q-score").textContent="0 / 0";document.getElementById("q-bonus").textContent="+0 pts";document.getElementById("q-done").style.display="none";document.getElementById("q-card").style.display="block";loadQ();}
 function loadQ(){if(curQ>=qList.length){endQuiz();return;}const qq=qList[curQ],p=people[qq.pi];if(!p){qList.splice(curQ,1);loadQ();return;}document.getElementById("q-about").textContent="ABOUT "+p.name.toUpperCase();document.getElementById("q-ctr").textContent="Question "+(curQ+1)+" of "+qList.length;document.getElementById("q-text").textContent=qq.q;document.getElementById("q-fb").style.display="none";document.getElementById("q-next").style.display="none";document.getElementById("q-opts").innerHTML=qq.opts.map((o,i)=>"<button class=\"qopt\" onclick=\"ansQ("+i+")\">"+ o+"</button>").join("");}
 function ansQ(chosen){const qq=qList[curQ],ok=chosen===qq.ans;if(ok)qScore++;qAns++;document.getElementById("q-score").textContent=qScore+" / "+qAns;document.getElementById("q-bonus").textContent="+"+(qScore*10)+" pts";document.querySelectorAll(".qopt").forEach((b,i)=>{b.disabled=true;if(i===qq.ans)b.classList.add("correct");else if(i===chosen&&!ok)b.classList.add("wrong");});const fb=document.getElementById("q-fb");fb.style.display="block";fb.style.background=ok?"#EAF3DE":"#FCEBEB";fb.style.color=ok?"#27500A":"#501313";fb.textContent=ok?"✓ Great memory!":"✗ Not quite — check your notes.";document.getElementById("q-next").style.display="block";}
 function nextQ(){curQ++;loadQ();}
