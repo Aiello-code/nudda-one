@@ -6,22 +6,35 @@ import json
 
 app = Flask(__name__)
 
-def count_trump_mentions():
-    url = "https://www.smh.com.au"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "html.parser")
-        text = soup.get_text().lower()
-        return text.count("trump")
-    return 0
-
+# Cache client at startup — avoid re-instantiating on every request
+_claude_client = None
 def get_claude_client():
+    global _claude_client
+    if _claude_client is not None:
+        return _claude_client
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         return None
     import anthropic
-    return anthropic.Anthropic(api_key=api_key)
+    _claude_client = anthropic.Anthropic(api_key=api_key)
+    return _claude_client
+
+def count_trump_mentions():
+    try:
+        url = "https://www.smh.com.au"
+        headers = {"User-Agent": "Mozilla/5.0"}
+        response = requests.get(url, headers=headers, timeout=6)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            text = soup.get_text().lower()
+            return text.count("trump")
+    except Exception:
+        pass
+    return 0
+
+@app.route("/ping")
+def ping():
+    return jsonify({"ok": True})
 
 @app.route("/")
 def index():
@@ -76,6 +89,7 @@ Only extract definitive statements, not guesses or things about other people."""
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=300,
+            timeout=12.0,
             messages=[{"role": "user", "content": prompt}]
         )
         raw = message.content[0].text.strip()
@@ -87,7 +101,7 @@ Only extract definitive statements, not guesses or things about other people."""
         else:
             return jsonify({"updates": []})
     except Exception:
-        return jsonify({"field": None})
+        return jsonify({"updates": []})
 
 @app.route("/api/generate-insights", methods=["POST"])
 def generate_insights():
@@ -133,6 +147,7 @@ Rules:
         message = client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=700,
+            timeout=20.0,
             messages=[{"role": "user", "content": prompt}]
         )
         result = json.loads(message.content[0].text.strip())

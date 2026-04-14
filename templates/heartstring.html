@@ -556,6 +556,25 @@ function applyTheme(name){
   });
 }
 let aiQueue=[];let _aiLock=false;
+
+// Fetch with AbortController timeout
+async function _fetch(url, opts, timeoutMs){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),timeoutMs||12000);
+  try{
+    const res=await fetch(url,{...opts,signal:ctrl.signal});
+    clearTimeout(timer);
+    return res;
+  }catch(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError')throw new Error('timeout');
+    throw e;
+  }
+}
+
+// Wake server on load, keep warm every 4 min while page is open
+(async()=>{try{await fetch('/ping');}catch(e){}})();
+setInterval(()=>{try{fetch('/ping');}catch(e){}},240000);
 function dismissAI(){aiQueue.shift();if(aiQueue.length>0){_showNextAI();}else{document.getElementById('ai-suggest').classList.remove('show');}}
 function applyAISuggestion(){
   if(!aiQueue.length)return;
@@ -595,15 +614,15 @@ async function analyzeNote(pi,text,silent){
   try{
     const p=people[pi];
     if(!p)return;
-    const res=await fetch('/api/analyze-note',{
+    const res=await _fetch('/api/analyze-note',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({note:text,person:{name:p.name,rel:p.rel,job:p.job,loves:p.loves,dislikes:p.dislikes,bday:p.bday}})
-    });
+    },12000);
     const data=await res.json();
     const updates=data.updates||[];
     updates.forEach(u=>{if(u.field&&u.value)showAISuggestion(pi,u.field,u.value,u.summary||'');});
-  }catch(e){}
+  }catch(e){if(e&&e.message==='timeout'&&!silent)toast('AI is warming up — note saved, analysis will retry next time');}
   finally{_aiLock=false;}
 }
 function renderInsights(data){
@@ -661,11 +680,14 @@ async function loadInsights(force){
   try{
     const notes=LS.getNotes();
     const pd=people.map((p,i)=>({...p,recentNotes:[...(notes[i]||[]).slice(0,3),...p.defaultNotes.slice(0,2)]}));
-    const res=await fetch('/api/generate-insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({people:pd})});
+    const res=await _fetch('/api/generate-insights',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({people:pd})},22000);
     const data=await res.json();
     if(data&&data.reflection){data.ts=Date.now();LS.setInsights(data);renderInsights(data);}
     else{if(cached)renderInsights(cached);}
-  }catch(e){if(cached)renderInsights(cached);}
+  }catch(e){
+    if(cached){renderInsights(cached);}
+    else{const ic=document.getElementById('ins-content');if(ic){ic.style.display='block';ic.innerHTML="<div class='card' style='text-align:center;padding:24px'><div style='font-size:24px;margin-bottom:8px'>&#128267;</div><div style='font-size:13px;color:var(--text2);margin-bottom:12px'>"+(e.message==='timeout'?'Server is warming up — try again in a moment':'Couldn’t connect to server')+"</div><button onclick='loadInsights(true)' style='background:var(--accent);color:#FFF;border:none;border-radius:9px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit'>Try again</button></div>";}}
+  }
   finally{
     if(ld)ld.style.display='none';
     if(ic)ic.style.display='block';
