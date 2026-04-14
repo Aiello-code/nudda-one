@@ -215,13 +215,13 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
   <div class='slbl'>The Essential 10</div><div class='card' id='e10'></div>
   </div>
   <div class='content screen' id='screen-addnote' style='padding-bottom:20px'>
-    <div class='dh'><div class='bk' onclick="showScreen('home')">&#8592;</div><div style='font-size:15px;font-weight:600;color:#1A1208'>Quick Note</div></div>
+    <div class='dh'><div class='bk' onclick="showScreen('home')">&#8592;</div><div style='font-size:15px;font-weight:600;color:var(--text)'>Quick Note</div></div>
     <div style='padding:14px 20px'>
-      <select id='note-who' style='width:100%;background:#FFF;border:0.5px solid rgba(0,0,0,0.12);border-radius:10px;padding:9px 12px;font-size:13px;color:#1A1208;outline:none;margin-bottom:10px'>
+      <select id='note-who' style='width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;margin-bottom:10px'>
         
       </select>
-      <textarea id='note-txt' style='width:100%;background:#FFF;border:0.5px solid rgba(0,0,0,0.12);border-radius:13px;padding:13px;font-size:13px;color:#1A1208;resize:none;min-height:120px;outline:none' placeholder='What do you want to remember?' rows='5'></textarea>
-      <div style='font-size:11px;color:#9B8B78;margin:10px 0 7px;font-weight:600'>QUICK PROMPTS</div>
+      <textarea id='note-txt' style='width:100%;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px;font-size:13px;color:#1A1208;resize:none;min-height:120px;outline:none' placeholder='What do you want to remember?' rows='5'></textarea>
+      <div style='font-size:11px;color:var(--text2);margin:10px 0 7px;font-weight:600'>QUICK PROMPTS</div>
       <div style='display:flex;gap:6px;flex-wrap:wrap' id='chips'></div>
       <button onclick='saveNote()' style='width:100%;background:#C96A30;color:#FFF;border:none;border-radius:13px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:14px'>Save note +5 pts</button>
     </div>
@@ -326,6 +326,22 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
       </div>
     </div>
   </div>
+  <div class='slbl'>Your data</div>
+  <div style='padding:0 20px;display:flex;flex-direction:column;gap:10px;margin-bottom:20px'>
+    <button onclick='exportData()' style='width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;font-family:inherit;text-align:left'>&#128229; Export my data <span style='font-size:11px;color:var(--text2);font-weight:400'>— download backup as JSON</span></button>
+    <label style='width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;font-family:inherit;display:block;box-sizing:border-box'>&#128228; Import data <span style='font-size:11px;color:var(--text2);font-weight:400'>— restore from backup</span><input type='file' accept='.json' onchange='importData(event)' style='display:none'></label>
+    <button onclick='if(confirm("Reset all data? This cannot be undone."))resetData()' style='width:100%;background:var(--card);border:1px solid rgba(226,75,74,0.4);border-radius:12px;padding:13px;font-size:13px;font-weight:600;color:#E24B4A;cursor:pointer;font-family:inherit;text-align:left'>&#128465; Reset all data</button>
+  </div>
+</div>
+<div id='welcome-overlay' style='display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;padding:24px'>
+  <div style='background:var(--card);border-radius:22px;padding:28px 24px;max-width:360px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,0.25)'>
+    <div style='font-size:36px;text-align:center;margin-bottom:14px'>&#128149;</div>
+    <div style='font-size:20px;font-weight:700;color:var(--text);font-family:Georgia,serif;text-align:center;margin-bottom:8px'>Welcome to Heartstring</div>
+    <div style='font-size:13px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:20px'>Your personal relationship journal. Keep notes on the people you care about, get quizzed on what matters, and let AI keep profiles updated.</div>
+    <div style='font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600'>What should we call you?</div>
+    <input id='welcome-name' placeholder='Your first name' style='width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--text);font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px'>
+    <button onclick='finishWelcome()' style='width:100%;background:var(--accent);color:#FFF;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit'>Get started</button>
+  </div>
 </div>
 <div id='ai-suggest'>
   <div style='font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.6px;margin-bottom:6px'>&#129504; AI SUGGESTION<span id='ai-ctr' style='font-weight:400;opacity:0.7'></span></div>
@@ -375,7 +391,7 @@ function generateQuizQuestions(){
 const e10=['Birthday and how they like to celebrate','Their biggest current worry or stressor','Their love language (gifts, words, quality time…)','Favourite food or restaurant','Main hobby or passion','Most important relationship in their life','Something they are currently working toward','A fond memory you share together','How they prefer to be supported when struggling','One thing that always makes them smile'];
 const chips=['Enjoyed a meal','Health update','Upcoming plan','Mood / feeling','Said something funny','Shared a memory'];
 const LS={
-  DEFAULTS:{people:null,insights:null,points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false,snoozeUntil:0,noteRef:null},quiz:{total:0,correct:0},userName:''},,
+  DEFAULTS:{people:null,insights:null,points:0,streak:{count:0,lastDate:null},notes:[],badges:[],checkin:{date:null,done:false,snoozeUntil:0,noteRef:null},quiz:{total:0,correct:0},userName:'',lastContact:{},firstRun:true},
   get(k){const r=localStorage.getItem('hs_'+k);return r!==null?JSON.parse(r):this.DEFAULTS[k];},
   set(k,v){localStorage.setItem('hs_'+k,JSON.stringify(v));},
   getPoints(){return this.get('points');},
@@ -383,7 +399,7 @@ const LS={
   getStreak(){return this.get('streak');},
   touchStreak(){const today=new Date().toDateString();const s=this.getStreak();if(s.lastDate===today)return s;const yest=new Date(Date.now()-86400000).toDateString();s.count=(s.lastDate===yest)?s.count+1:1;s.lastDate=today;this.set('streak',s);return s;},
   getNotes(){return this.get('notes');},
-  addNote(pi,text,type){const notes=this.getNotes();if(!notes[pi])notes[pi]=[];const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const entry={date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text};if(type)entry.type=type;notes[pi].unshift(entry);this.set('notes',notes);return notes;},getUserName(){return this.get('userName')||'';},setUserName(n){this.set('userName',n);},snoozeCheckin(){const ci=this.getCheckin();ci.snoozeUntil=Date.now()+7200000;this.set('checkin',ci);},setCheckinNote(ref){const ci=this.getCheckin();ci.noteRef=ref;this.set('checkin',ci);},
+  addNote(pi,text,type){const notes=this.getNotes();if(!notes[pi])notes[pi]=[];const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const entry={date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text};if(type)entry.type=type;notes[pi].unshift(entry);this.set('notes',notes);return notes;},getUserName(){return this.get('userName')||'';},setUserName(n){this.set('userName',n);},getLastContact(){return this.get('lastContact')||{};},setLastContact(pi){const lc=this.getLastContact();lc[pi]=new Date().toISOString();this.set('lastContact',lc);},isFirstRun(){return this.get('firstRun')!==false;},completeFirstRun(){this.set('firstRun',false);},snoozeCheckin(){const ci=this.getCheckin();ci.snoozeUntil=Date.now()+7200000;this.set('checkin',ci);},setCheckinNote(ref){const ci=this.getCheckin();ci.noteRef=ref;this.set('checkin',ci);},
   getBadges(){return this.get('badges');},
   addBadge(b){const badges=this.getBadges();if(!badges.includes(b)){badges.push(b);this.set('badges',badges);}return badges;},
   getCheckin(){return this.get('checkin');},
@@ -435,10 +451,11 @@ function refreshPeopleScreen(){
   document.getElementById('circle-sub').textContent=people.length+' of '+people.length+' people added';
 }
 function renderCircle(){
-  const n=LS.getNotes();
+  const n=LS.getNotes();const lcMap=LS.getLastContact();
   document.getElementById('people-list').innerHTML=people.map((p,i)=>{
     const nc=(n[i]||[]).length+p.defaultNotes.length;
-    return "<div class='person-card' onclick='showPerson("+i+")'><div class='av "+p.avc+"'>"+p.initials+"</div><div style='flex:1'><div class='pname'>"+p.name+"</div><div class='prel'>"+p.rel+" &middot; "+nc+" notes</div></div><div style='font-size:18px;color:#C4B6A6'>&#8250;</div></div>";
+    const lc=lcMap[i];let lcStr='';if(lc){const d=Math.floor((Date.now()-new Date(lc).getTime())/86400000);lcStr=d===0?' · reached out today':d===1?' · reached out yesterday':' · '+d+'d since last contact';}
+    return "<div class='person-card' onclick='showPerson("+i+")'><div class='av "+p.avc+"'>"+p.initials+"</div><div style='flex:1'><div class='pname'>"+escHtml(p.name)+"</div><div class='prel'>"+escHtml(p.rel)+" &middot; "+nc+" note"+(nc!==1?"s":"")+(lcStr?"<span style='color:var(--accent)'> "+escHtml(lcStr.slice(3))+"</span>":"")+"</div></div><div style='font-size:18px;color:var(--text2)'>&#8250;</div></div>";
   }).join('');
   refreshPeopleScreen();
   refreshNoteWho();
@@ -464,7 +481,16 @@ function showPerson(i){
   document.getElementById("d-av").textContent=p.initials;document.getElementById("d-av").className="dav "+p.avc;document.getElementById("d-nm").textContent=p.name;document.getElementById("d-rl").textContent=p.rel;
   const fields=[p.ann?["Anniversary",p.ann]:null,p.bday?["Birthday",p.bday]:null,p.job?["Job",p.job]:null,p.loves?["Loves",p.loves]:null,p.dislikes?["Dislikes",p.dislikes]:null].filter(f=>f&&f[1]);
   document.getElementById("d-facts").innerHTML=fields.length?fields.map(([k,v])=>"<div class=\"fr\"><div class=\"fk\">"+escHtml(k)+"</div><div class=\"fv\">"+escHtml(String(v))+"</div></div>").join(""):"<div style=\"font-size:12px;color:var(--text2);padding:4px 0\">No profile info yet. Tap Edit to add some.</div>";
-  document.getElementById("d-events").innerHTML=(()=>{const today=new Date();return p.events.map(e=>{const d=new Date(e.date);const nx=new Date(today.getFullYear(),d.getMonth(),d.getDate());if(nx<today)nx.setFullYear(today.getFullYear()+1);const days=Math.ceil((nx-today)/86400000);const hint=days===0?'Today!':days===1?'Tomorrow!':days+' days away';return "<div class=\"rem-card\"><div style=\"font-size:13px;font-weight:600;color:var(--text)\">"+escHtml(p.name)+"'s "+escHtml(e.name)+" · "+escHtml(e.date.replace(/,\\s*\\d{4}/,''))+"</div><div class=\"theme-tdesc\">"+hint+(p.gifts.length?" · "+p.gifts.length+" gift idea"+(p.gifts.length>1?"s":""):"")+"</div></div>";}).join('');})();
+  document.getElementById("d-events").innerHTML=(()=>{
+    const today=new Date();
+    function evtCard(label,dateStr,gifts){const d=new Date(dateStr);const nx=new Date(today.getFullYear(),d.getMonth(),d.getDate());if(nx<today)nx.setFullYear(today.getFullYear()+1);const days=Math.ceil((nx-today)/86400000);const hint=days===0?'Today!':days===1?'Tomorrow!':days+' days away';const ds=nx.toLocaleDateString('en-AU',{month:'short',day:'numeric'});return "<div class=\"rem-card\"><div style=\"font-size:13px;font-weight:600;color:var(--text)\">"+escHtml(label)+" · "+ds+"</div><div class=\"theme-tdesc\">"+hint+(gifts?" · "+gifts+" gift idea"+(gifts>1?"s":""):"")+"</div></div>";}
+    const cards=[];
+    (p.events||[]).forEach(e=>cards.push(evtCard(p.name+"'s "+e.name,e.date,p.gifts.length)));
+    if(p.bday&&!(p.events||[]).some(e=>e.name==='Birthday'))cards.push(evtCard(p.name+"'s Birthday",p.bday,0));
+    if(p.ann&&!(p.events||[]).some(e=>e.name==='Anniversary'))cards.push(evtCard(p.name+"'s Anniversary",p.ann,p.gifts.length));
+    if(!cards.length)return "<div class=\"rem-card\"><div style=\"font-size:12px;color:var(--text2)\">No upcoming events — add a birthday or anniversary in their profile.</div></div>";
+    return cards.join('');
+  })();
   document.getElementById("d-gifts").innerHTML=p.gifts.length?p.gifts.map(g=>"<div class=\"gi\"><div class=\"gdot\"></div><div style=\"font-size:12px;color:var(--text)\">"+escHtml(g)+"</div></div>").join(""):"<div style=\"font-size:12px;color:var(--text2);padding:4px 0\">No gift ideas yet. Edit profile to add some.</div>";
   const userNotes=(un[i]||[]);
   const defNotes=p.defaultNotes||[];
@@ -485,7 +511,7 @@ function loadQ(){if(curQ>=qList.length){endQuiz();return;}const qq=qList[curQ],p
 function ansQ(chosen){const qq=qList[curQ],ok=chosen===qq.ans;if(ok)qScore++;qAns++;document.getElementById("q-score").textContent=qScore+" / "+qAns;document.getElementById("q-bonus").textContent="+"+(qScore*10)+" pts";document.querySelectorAll(".qopt").forEach((b,i)=>{b.disabled=true;if(i===qq.ans)b.classList.add("correct");else if(i===chosen&&!ok)b.classList.add("wrong");});const fb=document.getElementById("q-fb");fb.style.display="block";fb.style.background=ok?"#EAF3DE":"#FCEBEB";fb.style.color=ok?"#27500A":"#501313";fb.textContent=ok?"✓ Great memory!":"✗ Not quite — check your notes.";document.getElementById("q-next").style.display="block";}
 function nextQ(){curQ++;loadQ();}
 function endQuiz(){document.getElementById("q-card").style.display="none";document.getElementById("q-done").style.display="block";document.getElementById("q-res").textContent="You scored "+qScore+" out of "+qList.length;const ep=qScore*10;document.getElementById("q-pts").textContent="+"+ep+" pts";LS.addQuizResult(qScore,qList.length);LS.addPoints(ep);LS.touchStreak();if(qScore===qList.length)LS.addBadge("🏆 Perfect Score");refreshPoints();refreshBadges();toast("Quiz done! +"+ep+" pts");qList=[...allQs];}
-function checkIn(){LS.setCheckin();LS.addPoints(10);LS.touchStreak();refreshPoints();buildCheckinCard();toast('Great! +10 pts added');}
+function checkIn(){const ci=LS.getCheckin();if(ci.noteRef&&ci.noteRef.pi!==undefined)LS.setLastContact(ci.noteRef.pi);LS.setCheckin();LS.addPoints(10);LS.touchStreak();refreshPoints();buildCheckinCard();renderCircle();toast('Great! +10 pts added');}
 function remindLater(){LS.snoozeCheckin();buildCheckinCard();toast('We’ll remind you in 2 hours');}
 function saveNote(){const ta=document.getElementById("note-txt");const pi=parseInt(document.getElementById("note-who").value);const text=ta.value.trim();if(!text){toast("Write something first!");return;}LS.addNote(pi,text);LS.addPoints(5);LS.touchStreak();if(LS.getNotes().flat().length>=5)LS.addBadge("📝 Note Taker");refreshPoints();refreshBadges();const savedText=text;const savedPi=pi;ta.value="";showScreen("home");toast("Note saved! +5 pts");analyzeNote(savedPi,savedText);}
 let voiceOn=false,vsec=0,vtick=null,wanim=null,recognition=null,voiceTranscript='';
@@ -620,7 +646,39 @@ function refreshGreeting(){const h=new Date().getHours();const part=h<12?'mornin
 function refreshHomeEvents(){const today=new Date();const evts=[];people.forEach(p=>{(p.events||[]).forEach(e=>{const d=new Date(e.date);let nx=new Date(today.getFullYear(),d.getMonth(),d.getDate());if(nx<today)nx.setFullYear(today.getFullYear()+1);const days=Math.ceil((nx-today)/86400000);const dateStr=nx.toLocaleDateString('en-AU',{month:'short',day:'numeric'});evts.push({label:p.name+"'s "+e.name,dateStr,days,gifts:p.gifts.length});});if(p.bday&&!p.events.some(e=>e.name==='Birthday')){const d=new Date(p.bday);let nx=new Date(today.getFullYear(),d.getMonth(),d.getDate());if(nx<today)nx.setFullYear(today.getFullYear()+1);const days=Math.ceil((nx-today)/86400000);evts.push({label:p.name+"'s Birthday",dateStr:nx.toLocaleDateString('en-AU',{month:'short',day:'numeric'}),days,gifts:0});}});evts.sort((a,b)=>a.days-b.days);const div=document.getElementById('home-events');if(!div)return;if(!evts.length){div.innerHTML="<div class='rem-card'><div style='font-size:12px;color:var(--text2)'>No upcoming events — add birthdays to profiles!</div></div>";return;}div.innerHTML=evts.slice(0,3).map(e=>{const hint=e.days===0?'Today!':e.days===1?'Tomorrow!':e.days+' days away';const gift=e.gifts>0?' · '+e.gifts+' gift idea'+(e.gifts>1?'s':''):'';return "<div class='rem-card'><div style='font-size:13px;font-weight:600;color:var(--text)'>"+escHtml(e.label)+" · "+e.dateStr+"</div><div class='theme-tdesc'>"+hint+gift+"</div></div>";}).join('');}
 function saveUserName(val){LS.setUserName(val.trim());refreshGreeting();}
 function initSettingsName(){const inp=document.getElementById('settings-name');if(inp)inp.value=LS.getUserName();}
-refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());const _ci=LS.getInsights();if(_ci)renderInsights(_ci);refreshGreeting();refreshHomeEvents();refreshVoiceWho();refreshVoiceRecent();initSettingsName();
+function exportData(){
+  const keys=['people','insights','points','streak','notes','badges','checkin','quiz','userName','lastContact'];
+  const data={exported:new Date().toISOString()};
+  keys.forEach(k=>{const v=localStorage.getItem('hs_'+k);if(v!==null)data[k]=JSON.parse(v);});
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='heartstring-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(a.href);
+  toast('Data exported!');
+}
+function importData(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{try{const data=JSON.parse(e.target.result);const keys=['people','insights','points','streak','notes','badges','checkin','quiz','userName','lastContact','firstRun'];keys.forEach(k=>{if(data[k]!==undefined)localStorage.setItem('hs_'+k,JSON.stringify(data[k]));});location.reload();}catch(err){toast('Invalid backup file');}};
+  reader.readAsText(file);
+}
+function resetData(){
+  ['people','insights','points','streak','notes','badges','checkin','quiz','userName','lastContact','firstRun','hs_theme'].forEach(k=>localStorage.removeItem('hs_'+k));
+  location.reload();
+}
+function finishWelcome(){
+  const nm=document.getElementById('welcome-name').value.trim();
+  if(nm)LS.setUserName(nm);
+  LS.completeFirstRun();
+  document.getElementById('welcome-overlay').style.display='none';
+  refreshGreeting();
+  if(nm)toast('Welcome, '+nm+' 💙');
+}
+function checkFirstRun(){
+  if(LS.isFirstRun()){
+    const ov=document.getElementById('welcome-overlay');
+    if(ov)ov.style.display='flex';
+  }
+}
+refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());const _ci=LS.getInsights();if(_ci)renderInsights(_ci);refreshGreeting();refreshHomeEvents();refreshVoiceWho();refreshVoiceRecent();initSettingsName();checkFirstRun();
 </script>
 </body>
 </html>
