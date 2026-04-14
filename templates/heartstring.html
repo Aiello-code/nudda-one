@@ -121,7 +121,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
 <div class='phone'>
   <div class='status'><span id='clk'>9:41</span><span style='font-size:11px'>&#9679;&#9679;&#9679; WiFi</span></div>
   <div class='content screen active' id='screen-home'>
-    <div class='ph' style='display:flex;justify-content:space-between;align-items:center'><div><div class='ptitle'>Good morning, Alex</div><div class='psub'>3 people in your circle</div></div><button onclick="showScreen('settings')" style='background:none;border:none;cursor:pointer;font-size:22px;padding:6px;color:var(--text2);flex-shrink:0' title='Settings'>&#9881;&#65039;</button></div>
+    <div class='ph' style='display:flex;justify-content:space-between;align-items:center'><div><div class='ptitle' id='home-greeting'>Good morning</div><div class='psub' id='home-sub'>Loading your circle...</div></div><button onclick="showScreen('settings')" style='background:none;border:none;cursor:pointer;font-size:22px;padding:6px;color:var(--text2);flex-shrink:0' title='Settings'>&#9881;&#65039;</button></div>
     <div class='streak-card'>
       <div style='display:flex;justify-content:space-between;align-items:flex-start'>
         <div>
@@ -141,9 +141,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
         <div style='font-size:9px;color:rgba(255,255,255,0.6)' id='pts-pct'>70%</div>
       </div>
     </div>
-    <div class='slbl'>Upcoming events</div>
-    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Emma&#39;s Anniversary &middot; June 12</div><div class='theme-tdesc'>61 days away &middot; Time to plan a gift</div></div>
-    <div class='rem-card'><div style='font-size:13px;font-weight:600;color:#1A1208'>Jamie&#39;s Birthday &middot; July 22</div><div class='theme-tdesc'>101 days away &middot; 3 gift ideas ready</div></div>
+    <div class='slbl'>Upcoming events</div><div id='home-events'></div>
     <div class='slbl'>Quick actions</div>
     <div class='act-row'>
       <div class='act-btn' onclick="showScreen('addnote')"><div class='act-icon' style='background:#FAEEDA'>&#9999;&#65039;</div><div class='act-lbl'>Add Note</div></div>
@@ -151,15 +149,7 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
       <div class='act-btn' onclick="showScreen('quiz');initQuiz()"><div class='act-icon' style='background:#EAF3DE'>&#129504;</div><div class='act-lbl'>Quiz Me</div></div>
       <div class='act-btn' onclick="showScreen('insights')"><div class='act-icon' style='background:#E6F1FB'>&#128161;</div><div class='act-lbl'>Insights</div></div>
     </div>
-    <div class='slbl'>Today&#39;s check-in</div>
-    <div class='card'>
-      <div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:7px'>ABOUT EMMA</div>
-      <div style='font-size:14px;color:#1A1208;line-height:1.55;font-family:Georgia,serif'>&#8220;Emma mentioned feeling overwhelmed at work last Tuesday. Have you checked in with her since then?&#8221;</div>
-      <div style='margin-top:12px;display:flex;gap:7px' id='checkin-btns'>
-        <button onclick='checkIn(this)' style='flex:1;background:#EAF3DE;border:none;border-radius:9px;padding:9px;font-size:12px;color:#3B6D11;cursor:pointer;font-family:inherit;font-weight:600'>Yes, I did &#10003;</button>
-        <button onclick='remindLater(this)' style='flex:1;background:#FBF6EF;border:0.5px solid rgba(0,0,0,0.1);border-radius:9px;padding:9px;font-size:12px;color:#6B5B45;cursor:pointer;font-family:inherit'>Remind me later</button>
-      </div>
-    </div>
+    <div class='slbl'>Today's check-in</div><div id='home-checkin'></div>
     <div class='slbl'>Your badges</div>
     <div class='badge-row' id='badge-row'></div>
     <div style='height:20px'></div>
@@ -237,19 +227,27 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
     </div>
   </div>
   <div class='content screen' id='screen-voice'>
-    <div class='dh'><div class='bk' onclick="showScreen('home');stopVoice()">&#8592;</div><div style='font-size:15px;font-weight:600;color:#1A1208'>Voice Note</div></div>
-    <div style='padding:30px 20px;text-align:center'>
-      <div style='font-size:12px;color:#9B8B78;margin-bottom:7px'>Recording for</div>
-      <select style='background:#FAEEDA;border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;color:#854F0B;font-family:inherit;outline:none;margin-bottom:30px'><option>Emma</option><option>Dad</option><option>Jamie</option></select>
-      <div style='height:56px;display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:28px' id='waveform'>
+    <div class='dh'><div class='bk' onclick="showScreen('home');stopVoice()">&#8592;</div><div style='font-size:15px;font-weight:600;color:var(--text)'>Voice Note</div></div>
+    <div style='padding:20px 20px;text-align:center'>
+      <div style='font-size:12px;color:var(--text2);margin-bottom:7px'>Recording for</div>
+      <select id='voice-who' style='background:var(--accent-light);border:none;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--accent-dark);font-family:inherit;outline:none;margin-bottom:24px'></select>
+      <div style='height:56px;display:flex;align-items:center;justify-content:center;gap:3px;margin-bottom:24px' id='waveform'>
         <div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div><div class='wbar'></div>
       </div>
       <button class='vbtn' id='vbtn' onmousedown='startVoice()' onmouseup='stopVoice()' ontouchstart='startVoice(event)' ontouchend='stopVoice()'>&#127897;&#65039;</button>
-      <div style='font-size:28px;font-weight:700;color:#C96A30;font-family:Georgia,serif;margin:18px 0 6px' id='vtimer'>0:00</div>
-      <div style='font-size:12px;color:#9B8B78' id='vlbl'>Hold the button to record</div>
-      <div style='margin-top:28px;background:#FBF6EF;border-radius:14px;padding:14px;text-align:left'>
-        <div style='font-size:10px;color:#9B8B78;font-weight:700;margin-bottom:6px'>RECENT VOICE NOTES</div>
-        <div style='font-size:12px;color:#1A1208;line-height:1.8'>&#128206; Emma &middot; 0:23 &middot; 10 Apr<br>&#128206; Jamie &middot; 0:41 &middot; 8 Apr<br>&#128206; Dad &middot; 1:02 &middot; 5 Apr</div>
+      <div style='font-size:28px;font-weight:700;color:var(--accent);font-family:Georgia,serif;margin:14px 0 4px' id='vtimer'>0:00</div>
+      <div style='font-size:12px;color:var(--text2)' id='vlbl'>Hold the button to record</div>
+      <div id='vtranscript-area' style='display:none;margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:left'>
+        <div style='font-size:10px;color:var(--accent);font-weight:700;margin-bottom:6px'>TRANSCRIPT — tap to edit</div>
+        <div id='vtranscript' contenteditable='true' style='font-size:13px;color:var(--text);line-height:1.55;min-height:40px;outline:none'></div>
+        <div style='display:flex;gap:8px;margin-top:10px'>
+          <button onclick='saveVoiceNote()' style='flex:1;background:var(--accent);color:#FFF;border:none;border-radius:9px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit'>Save note</button>
+          <button onclick='discardVoice()' style='background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:inherit'>Discard</button>
+        </div>
+      </div>
+      <div style='margin-top:20px;background:var(--card);border-radius:14px;padding:14px;text-align:left'>
+        <div style='font-size:10px;color:var(--text2);font-weight:700;margin-bottom:8px'>RECENT VOICE NOTES</div>
+        <div id='voice-recent' style='font-size:12px;color:var(--text);line-height:1.8'></div>
       </div>
     </div>
   </div>
@@ -282,6 +280,13 @@ textarea,select{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-ser
 </div></div>
 <div class='content screen' id='screen-settings' style='padding-bottom:30px'>
   <div class='ph'><div class='bk' onclick="showScreen('home')">&#8592;</div><div class='ptitle'>Settings</div></div>
+  <div class='slbl'>Your name</div>
+  <div style='padding:0 20px;margin-bottom:4px'>
+    <div style='display:flex;gap:8px;align-items:center'>
+      <input id='settings-name' placeholder='e.g. Alex' oninput='saveUserName(this.value)' style='flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:var(--text);font-family:inherit;outline:none'>
+    </div>
+    <div style='font-size:11px;color:var(--text2);margin-top:5px'>Used in your personalised greeting</div>
+  </div>
   <div class='slbl'>Colour theme</div>
   <div style='padding:0 20px;display:flex;flex-direction:column;gap:10px'>
     <div onclick="applyTheme('warm')" id='theme-warm' class='theme-card'>
@@ -359,7 +364,7 @@ const allQs=[
 const e10=['Birthday and how they like to celebrate','Their biggest current worry or stressor','Their love language (gifts, words, quality time…)','Favourite food or restaurant','Main hobby or passion','Most important relationship in their life','Something they are currently working toward','A fond memory you share together','How they prefer to be supported when struggling','One thing that always makes them smile'];
 const chips=['Enjoyed a meal','Health update','Upcoming plan','Mood / feeling','Said something funny','Shared a memory'];
 const LS={
-  DEFAULTS:{people:null,insights:null,points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false},quiz:{total:0,correct:0}},
+  DEFAULTS:{people:null,insights:null,points:340,streak:{count:7,lastDate:null},notes:[],badges:['🔥 7-Day Streak','📝 Note Taker','🧠 Quiz Master','🎁 Gift Giver'],checkin:{date:null,done:false,snoozeUntil:0,noteRef:null},quiz:{total:0,correct:0},userName:''},,
   get(k){const r=localStorage.getItem('hs_'+k);return r!==null?JSON.parse(r):this.DEFAULTS[k];},
   set(k,v){localStorage.setItem('hs_'+k,JSON.stringify(v));},
   getPoints(){return this.get('points');},
@@ -367,7 +372,7 @@ const LS={
   getStreak(){return this.get('streak');},
   touchStreak(){const today=new Date().toDateString();const s=this.getStreak();if(s.lastDate===today)return s;const yest=new Date(Date.now()-86400000).toDateString();s.count=(s.lastDate===yest)?s.count+1:1;s.lastDate=today;this.set('streak',s);return s;},
   getNotes(){return this.get('notes');},
-  addNote(pi,text){const notes=this.getNotes();if(!notes[pi])notes[pi]=[];const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];notes[pi].unshift({date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text});this.set('notes',notes);return notes;},
+  addNote(pi,text,type){const notes=this.getNotes();if(!notes[pi])notes[pi]=[];const now=new Date();const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const entry={date:now.getDate()+' '+m[now.getMonth()]+' '+now.getFullYear(),text};if(type)entry.type=type;notes[pi].unshift(entry);this.set('notes',notes);return notes;},getUserName(){return this.get('userName')||'';},setUserName(n){this.set('userName',n);},snoozeCheckin(){const ci=this.getCheckin();ci.snoozeUntil=Date.now()+7200000;this.set('checkin',ci);},setCheckinNote(ref){const ci=this.getCheckin();ci.noteRef=ref;this.set('checkin',ci);},
   getBadges(){return this.get('badges');},
   addBadge(b){const badges=this.getBadges();if(!badges.includes(b)){badges.push(b);this.set('badges',badges);}return badges;},
   getCheckin(){return this.get('checkin');},
@@ -387,7 +392,30 @@ function refreshPoints(){
   else{document.getElementById("pts-bar").style.width="100%";document.getElementById("pts-prog").textContent="Max level reached!";document.getElementById("pts-pct").textContent="100%";}
 }
 function refreshBadges(){document.getElementById("badge-row").innerHTML=LS.getBadges().map(b=>"<div class=\"badge\">"+b+"</div>").join("");}
-function refreshCheckin(){const ci=LS.getCheckin();if(ci.date===new Date().toDateString()&&ci.done){document.getElementById("checkin-btns").innerHTML="<div style=\"font-size:13px;color:#3B6D11;font-weight:600;padding:6px 0\">✓ Checked in today — great work!</div>";}}
+function buildCheckinCard(){
+  const ci=LS.getCheckin();const today=new Date().toDateString();
+  const div=document.getElementById('home-checkin');if(!div)return;
+  if(ci.date===today&&ci.done){div.innerHTML="<div class='card' style='padding:12px 16px'><div style='font-size:13px;color:#3B6D11;font-weight:600'>&#10003; Checked in today — great work!</div></div>";return;}
+  if(ci.snoozeUntil&&Date.now()<ci.snoozeUntil){div.innerHTML='';return;}
+  // Pick a note to show
+  const notes=LS.getNotes();
+  let candidates=[];
+  people.forEach((p,pi)=>{
+    const all=[...(notes[pi]||[]),...(p.defaultNotes||[])];
+    if(all.length)candidates.push({pi,name:p.name,note:all[0]});
+  });
+  if(!candidates.length){div.innerHTML='';return;}
+  // Use stored ref if same day, else pick new one
+  let pick;
+  if(ci.noteRef&&ci.noteRef.day===today){
+    pick=candidates.find(c=>c.pi===ci.noteRef.pi)||candidates[0];
+  } else {
+    pick=candidates[Math.floor(Math.random()*candidates.length)];
+    LS.setCheckinNote({pi:pick.pi,day:today});
+  }
+  div.innerHTML="<div class='card'><div style='font-size:10px;color:var(--text2);font-weight:700;margin-bottom:7px'>ABOUT "+escHtml(pick.name.toUpperCase())+"</div><div style='font-size:14px;color:var(--text);line-height:1.55;font-family:Georgia,serif'>“"+escHtml(pick.note.text)+"”</div><div style='margin-top:12px;display:flex;gap:7px'><button onclick='checkIn()' style='flex:1;background:#EAF3DE;border:none;border-radius:9px;padding:9px;font-size:12px;color:#3B6D11;cursor:pointer;font-family:inherit;font-weight:600'>Yes, I reached out ✓</button><button onclick='remindLater()' style='flex:1;background:var(--card);border:0.5px solid var(--border);border-radius:9px;padding:9px;font-size:12px;color:var(--text2);cursor:pointer;font-family:inherit'>Remind me in 2h</button></div></div>";
+}
+function refreshCheckin(){buildCheckinCard();}
 function refreshPeopleScreen(){
   const q=LS.getQuiz();
   const n=LS.getNotes();
@@ -446,12 +474,16 @@ function loadQ(){if(curQ>=qList.length){endQuiz();return;}const qq=qList[curQ],p
 function ansQ(chosen){const qq=qList[curQ],ok=chosen===qq.ans;if(ok)qScore++;qAns++;document.getElementById("q-score").textContent=qScore+" / "+qAns;document.getElementById("q-bonus").textContent="+"+(qScore*10)+" pts";document.querySelectorAll(".qopt").forEach((b,i)=>{b.disabled=true;if(i===qq.ans)b.classList.add("correct");else if(i===chosen&&!ok)b.classList.add("wrong");});const fb=document.getElementById("q-fb");fb.style.display="block";fb.style.background=ok?"#EAF3DE":"#FCEBEB";fb.style.color=ok?"#27500A":"#501313";fb.textContent=ok?"✓ Great memory!":"✗ Not quite — check your notes.";document.getElementById("q-next").style.display="block";}
 function nextQ(){curQ++;loadQ();}
 function endQuiz(){document.getElementById("q-card").style.display="none";document.getElementById("q-done").style.display="block";document.getElementById("q-res").textContent="You scored "+qScore+" out of "+qList.length;const ep=qScore*10;document.getElementById("q-pts").textContent="+"+ep+" pts";LS.addQuizResult(qScore,qList.length);LS.addPoints(ep);LS.touchStreak();if(qScore===qList.length)LS.addBadge("🏆 Perfect Score");refreshPoints();refreshBadges();toast("Quiz done! +"+ep+" pts");qList=[...allQs];}
-function checkIn(btn){btn.style.background="#4A7C59";btn.style.color="#FFF";btn.textContent="Checked in ✓";btn.disabled=true;const s=document.querySelector("#checkin-btns button:last-child");if(s)s.disabled=true;LS.setCheckin();LS.addPoints(10);LS.touchStreak();refreshPoints();toast("Great! +10 pts added");}
-function remindLater(btn){btn.textContent="Reminder set ⏰";btn.disabled=true;}
+function checkIn(){LS.setCheckin();LS.addPoints(10);LS.touchStreak();refreshPoints();buildCheckinCard();toast('Great! +10 pts added');}
+function remindLater(){LS.snoozeCheckin();buildCheckinCard();toast('We’ll remind you in 2 hours');}
 function saveNote(){const ta=document.getElementById("note-txt");const pi=parseInt(document.getElementById("note-who").value);const text=ta.value.trim();if(!text){toast("Write something first!");return;}LS.addNote(pi,text);LS.addPoints(5);LS.touchStreak();if(LS.getNotes().flat().length>=5)LS.addBadge("📝 Note Taker");refreshPoints();refreshBadges();const savedText=text;const savedPi=pi;ta.value="";showScreen("home");toast("Note saved! +5 pts");analyzeNote(savedPi,savedText);}
-let voiceOn=false,vsec=0,vtick=null,wanim=null;
-function startVoice(e){if(e)e.preventDefault();voiceOn=true;vsec=0;document.getElementById("vbtn").style.background="#E24B4A";document.getElementById("vlbl").textContent="Recording…";vtick=setInterval(()=>{vsec++;const m=Math.floor(vsec/60),s=vsec%60;document.getElementById("vtimer").textContent=m+":"+(s<10?"0":"")+s;},1000);wanim=setInterval(()=>{document.querySelectorAll(".wbar").forEach(b=>{b.style.height=(Math.floor(Math.random()*44)+6)+"px";});},110);}
-function stopVoice(){if(!voiceOn)return;voiceOn=false;clearInterval(vtick);clearInterval(wanim);document.getElementById("vbtn").style.background="#C96A30";document.getElementById("vlbl").textContent="Voice note saved! +10 pts";document.querySelectorAll(".wbar").forEach(b=>b.style.height="8px");LS.addPoints(10);LS.touchStreak();refreshPoints();setTimeout(()=>{document.getElementById("vlbl").textContent="Hold the button to record";document.getElementById("vtimer").textContent="0:00";},2200);}
+let voiceOn=false,vsec=0,vtick=null,wanim=null,recognition=null,voiceTranscript='';
+function startVoice(e){if(e)e.preventDefault();if(voiceOn)return;voiceOn=true;vsec=0;voiceTranscript='';document.getElementById('vtranscript-area').style.display='none';document.getElementById('vtranscript').textContent='';document.getElementById('vbtn').style.background='#E24B4A';document.getElementById('vlbl').textContent='Recording…';vtick=setInterval(()=>{vsec++;const m=Math.floor(vsec/60),s=vsec%60;document.getElementById('vtimer').textContent=m+':'+(s<10?'0':'')+s;},1000);wanim=setInterval(()=>{document.querySelectorAll('.wbar').forEach(b=>{b.style.height=(Math.floor(Math.random()*44)+6)+'px';});},110);const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(SR){recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang='en-US';recognition.onresult=(ev)=>{let fin='',int='';for(let i=ev.resultIndex;i<ev.results.length;i++){if(ev.results[i].isFinal)fin+=ev.results[i][0].transcript+' ';else int+=ev.results[i][0].transcript;}voiceTranscript+=fin;document.getElementById('vtranscript').textContent=(voiceTranscript+int).trim();};recognition.onerror=()=>{};recognition.start();}else{document.getElementById('vlbl').textContent='Recording (no transcription on this browser)…';}}
+function stopVoice(){if(!voiceOn)return;voiceOn=false;clearInterval(vtick);clearInterval(wanim);if(recognition){try{recognition.stop();}catch(e){}recognition=null;}document.getElementById('vbtn').style.background='var(--accent)';document.querySelectorAll('.wbar').forEach(b=>b.style.height='8px');const text=(voiceTranscript||document.getElementById('vtranscript').textContent||'').trim();if(text){document.getElementById('vtranscript').textContent=text;document.getElementById('vtranscript-area').style.display='block';document.getElementById('vlbl').textContent='Review and save your note';}else{document.getElementById('vlbl').textContent='Nothing captured. Try again.';document.getElementById('vtimer').textContent='0:00';}}
+function saveVoiceNote(){const text=document.getElementById('vtranscript').textContent.trim();const pi=parseInt(document.getElementById('voice-who').value);if(!text||isNaN(pi)){toast('Nothing to save');return;}LS.addNote(pi,text,'voice');LS.addPoints(10);LS.touchStreak();refreshPoints();refreshVoiceRecent();analyzeNote(pi,text);document.getElementById('vtranscript-area').style.display='none';document.getElementById('vtranscript').textContent='';document.getElementById('vtimer').textContent='0:00';document.getElementById('vlbl').textContent='Hold the button to record';voiceTranscript='';toast('Voice note saved! +10 pts');}
+function discardVoice(){document.getElementById('vtranscript-area').style.display='none';document.getElementById('vtranscript').textContent='';document.getElementById('vtimer').textContent='0:00';document.getElementById('vlbl').textContent='Hold the button to record';voiceTranscript='';}
+function refreshVoiceRecent(){const notes=LS.getNotes();const recent=[];people.forEach((p,pi)=>{(notes[pi]||[]).filter(n=>n.type==='voice').forEach(n=>recent.push({name:p.name,date:n.date,text:n.text}));});recent.sort((a,b)=>0);const div=document.getElementById('voice-recent');if(!div)return;if(!recent.length){div.innerHTML="<span style='color:var(--text2)'>No voice notes yet</span>";return;}div.innerHTML=recent.slice(0,5).map(n=>"<div style='padding:5px 0;border-bottom:0.5px solid var(--border)'><span style='color:var(--accent);font-weight:600'>"+escHtml(n.name)+"</span> · <span style='color:var(--text2)'>"+escHtml(n.date)+"</span><div style='font-size:11px;color:var(--text);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis'>"+escHtml(n.text)+"</div></div>").join('');}
+function refreshVoiceWho(){const sel=document.getElementById('voice-who');if(!sel)return;sel.innerHTML=people.map((p,i)=>"<option value='"+i+"'>"+escHtml(p.name)+"</option>").join('');}
 function insertChip(t){const ta=document.getElementById("note-txt");if(ta){ta.value=(ta.value?ta.value+" ":"")+t+": ";ta.focus();}}
 let editGifts=[];
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
@@ -573,7 +605,11 @@ updateClock();setInterval(updateClock,60000);
 document.getElementById("chips").innerHTML=chips.map(c=>"<div onclick=\"insertChip('"+ c +"')\" style=\"background:#FAEEDA;border:0.5px solid rgba(201,106,48,0.25);border-radius:20px;padding:5px 10px;font-size:10px;font-weight:600;color:#854F0B;cursor:pointer\">"+ c+"</div>").join("");
 document.getElementById("e10").innerHTML=e10.map((item,i)=>"<div class=\"e10-item\"><div class=\"e10-num\">"+(i+1)+"</div><div style=\"font-size:12px;color:#1A1208;line-height:1.4\">"+item+"</div></div>").join("");
 
-refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());const _ci=LS.getInsights();if(_ci)renderInsights(_ci);
+function refreshGreeting(){const h=new Date().getHours();const part=h<12?'morning':h<17?'afternoon':'evening';const name=LS.getUserName();const g=document.getElementById('home-greeting');const s=document.getElementById('home-sub');if(g)g.textContent='Good '+part+(name?', '+name:'');if(s)s.textContent=people.length+' '+(people.length===1?'person':'people')+' in your circle';}
+function refreshHomeEvents(){const today=new Date();const evts=[];people.forEach(p=>{(p.events||[]).forEach(e=>{const d=new Date(e.date);let nx=new Date(today.getFullYear(),d.getMonth(),d.getDate());if(nx<today)nx.setFullYear(today.getFullYear()+1);const days=Math.ceil((nx-today)/86400000);const dateStr=nx.toLocaleDateString('en-AU',{month:'short',day:'numeric'});evts.push({label:p.name+"'s "+e.name,dateStr,days,gifts:p.gifts.length});});if(p.bday&&!p.events.some(e=>e.name==='Birthday')){const d=new Date(p.bday);let nx=new Date(today.getFullYear(),d.getMonth(),d.getDate());if(nx<today)nx.setFullYear(today.getFullYear()+1);const days=Math.ceil((nx-today)/86400000);evts.push({label:p.name+"'s Birthday",dateStr:nx.toLocaleDateString('en-AU',{month:'short',day:'numeric'}),days,gifts:0});}});evts.sort((a,b)=>a.days-b.days);const div=document.getElementById('home-events');if(!div)return;if(!evts.length){div.innerHTML="<div class='rem-card'><div style='font-size:12px;color:var(--text2)'>No upcoming events — add birthdays to profiles!</div></div>";return;}div.innerHTML=evts.slice(0,3).map(e=>{const hint=e.days===0?'Today!':e.days===1?'Tomorrow!':e.days+' days away';const gift=e.gifts>0?' · '+e.gifts+' gift idea'+(e.gifts>1?'s':''):'';return "<div class='rem-card'><div style='font-size:13px;font-weight:600;color:var(--text)'>"+escHtml(e.label)+" · "+e.dateStr+"</div><div class='theme-tdesc'>"+hint+gift+"</div></div>";}).join('');}
+function saveUserName(val){LS.setUserName(val.trim());refreshGreeting();}
+function initSettingsName(){const inp=document.getElementById('settings-name');if(inp)inp.value=LS.getUserName();}
+refreshPoints();refreshBadges();refreshCheckin();renderCircle();initQuiz();applyTheme(LS.getTheme());const _ci=LS.getInsights();if(_ci)renderInsights(_ci);refreshGreeting();refreshHomeEvents();refreshVoiceWho();refreshVoiceRecent();initSettingsName();
 </script>
 </body>
 </html>
