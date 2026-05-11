@@ -251,15 +251,18 @@
           body: JSON.stringify(payload)
         });
         const data = await res.json();
+        console.log('Submit response:', JSON.stringify(data));
         if (data.ok) {
           document.getElementById('form').style.display = 'none';
           document.getElementById('success').style.display = 'block';
         } else {
-          throw new Error('server error');
+          throw new Error(data.error || 'server error');
         }
-      } catch {
+      } catch (e) {
+        console.error('Submit error:', e);
         btn.disabled = false;
-        btn.textContent = 'Send to James ✉︎';
+        btn.textContent = 'Send to James \u2709\ufe0e';
+        err.textContent = 'Something went wrong: ' + e.message;
         err.style.display = 'block';
       }
     });

@@ -104,25 +104,27 @@ def olivia_submit():
         message = "\n".join(lines)
 
         # Notification is best-effort — never block a successful submission
+        ntfy_error = None
         topic = os.environ.get("NTFY_TOPIC")
         if topic:
             try:
-                requests.post(
+                r = requests.post(
                     f"https://ntfy.sh/{topic}",
                     data=message.encode("utf-8"),
                     headers={
-                        "Title": "Olivia checked in \U0001f48c",
+                        "Title": "Olivia checked in",
                         "Priority": "high",
                         "Tags": "heartpulse",
                     },
                     timeout=8,
                 )
-            except Exception:
-                pass  # Notification failed but submission still succeeded
+                ntfy_error = None if r.status_code == 200 else f"ntfy status {r.status_code}: {r.text[:200]}"
+            except Exception as e:
+                ntfy_error = str(e)
 
-        return jsonify({"ok": True})
+        return jsonify({"ok": True, "ntfy_error": ntfy_error})
     except Exception as e:
-        return jsonify({"ok": False, "error": str(e)})
+        return jsonify({"ok": False, "error": str(e), "stage": "submission"})
 
 @app.route("/api/analyze-note", methods=["POST"])
 def analyze_note():
