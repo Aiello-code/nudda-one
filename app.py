@@ -60,11 +60,11 @@ def olivia():
 @app.route("/api/olivia-submit", methods=["POST"])
 def olivia_submit():
     try:
-        data = request.get_json()
-        mood  = data.get("mood", "Not specified")
-        q1    = data.get("q1", "").strip()
-        q2    = data.get("q2", "").strip()
-        q3    = data.get("q3", "").strip()
+        data = request.get_json(silent=True) or {}
+        mood = data.get("mood", "Not specified")
+        q1   = (data.get("q1") or "").strip()
+        q2   = (data.get("q2") or "").strip()
+        q3   = (data.get("q3") or "").strip()
 
         lines = [
             f"Mood: {mood}",
@@ -77,18 +77,22 @@ def olivia_submit():
         ]
         message = "\n".join(lines)
 
+        # Notification is best-effort — never block a successful submission
         topic = os.environ.get("NTFY_TOPIC")
         if topic:
-            requests.post(
-                f"https://ntfy.sh/{topic}",
-                data=message.encode("utf-8"),
-                headers={
-                    "Title": "Olivia checked in 💌",
-                    "Priority": "high",
-                    "Tags": "heartpulse",
-                },
-                timeout=8,
-            )
+            try:
+                requests.post(
+                    f"https://ntfy.sh/{topic}",
+                    data=message.encode("utf-8"),
+                    headers={
+                        "Title": "Olivia checked in \U0001f48c",
+                        "Priority": "high",
+                        "Tags": "heartpulse",
+                    },
+                    timeout=8,
+                )
+            except Exception:
+                pass  # Notification failed but submission still succeeded
 
         return jsonify({"ok": True})
     except Exception as e:
