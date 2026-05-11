@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Olivia's Page</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #FDF6EE;
+      font-family: Georgia, serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      color: #2C1A0E;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header .heart {
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+    }
+
+    .header h1 {
+      font-size: 1.7rem;
+      font-weight: normal;
+      color: #2C1A0E;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      color: #9B7A5A;
+      line-height: 1.6;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+
+    .card label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #9B7A5A;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      font-family: Arial, sans-serif;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+
+    /* Mood picker */
+    .mood-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mood-btn {
+      flex: 1;
+      background: #FDF6EE;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      padding: 10px 4px;
+      font-size: 1.6rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .mood-btn span {
+      display: block;
+      font-family: Arial, sans-serif;
+      font-size: 0.62rem;
+      color: #9B7A5A;
+      margin-top: 4px;
+    }
+
+    .mood-btn:hover { background: #FAEEDA; }
+    .mood-btn.selected { border-color: #C96A30; background: #FAEEDA; }
+    .mood-btn.selected span { color: #C96A30; font-weight: bold; }
+
+    /* Text areas */
+    textarea {
+      width: 100%;
+      background: #FDF6EE;
+      border: 1.5px solid #E8D9C8;
+      border-radius: 12px;
+      padding: 13px 15px;
+      font-size: 0.95rem;
+      font-family: Georgia, serif;
+      color: #2C1A0E;
+      resize: none;
+      outline: none;
+      line-height: 1.6;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { border-color: #C96A30; }
+    textarea::placeholder { color: #C4A882; }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      background: #C96A30;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 1rem;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.15s;
+      letter-spacing: 0.3px;
+    }
+
+    .submit-btn:hover { background: #B05A24; }
+    .submit-btn:disabled { background: #D4A98A; cursor: default; }
+
+    /* Success state */
+    .success {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .success .big { font-size: 3rem; margin-bottom: 16px; }
+    .success h2 { font-size: 1.4rem; font-weight: normal; margin-bottom: 10px; }
+    .success p { color: #9B7A5A; font-size: 0.95rem; line-height: 1.6; }
+
+    .error-msg {
+      color: #C0392B;
+      font-size: 0.85rem;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="header">
+      <div class="heart">🌸</div>
+      <h1>Olivia's Page</h1>
+      <p>A little check-in, just between us.<br>Takes about a minute.</p>
+    </div>
+
+    <form id="form">
+
+      <div class="card">
+        <label>How are you feeling right now?</label>
+        <div class="mood-row">
+          <button type="button" class="mood-btn" data-mood="Really rough">
+            😔<span>Rough</span>
+          </button>
+          <button type="button" class="mood-btn" data-mood="Not great">
+            😕<span>Not great</span>
+          </button>
+          <button type="button" class="mood-btn" data-mood="Okay">
+            😊<span>Okay</span>
+          </button>
+          <button type="button" class="mood-btn" data-mood="Pretty good">
+            😄<span>Pretty good</span>
+          </button>
+          <button type="button" class="mood-btn" data-mood="Amazing">
+            🤩<span>Amazing</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <label>What's been on your mind lately?</label>
+        <textarea id="q1" rows="3" placeholder="Anything at all — big or small..."></textarea>
+      </div>
+
+      <div class="card">
+        <label>Is there anything you'd like James to know?</label>
+        <textarea id="q2" rows="3" placeholder="Something you've been wanting to say..."></textarea>
+      </div>
+
+      <div class="card">
+        <label>How have you been looking after yourself?</label>
+        <textarea id="q3" rows="2" placeholder="Sleep, food, exercise, rest..."></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">Send to James ✉︎</button>
+      <div class="error-msg" id="error-msg">Something went wrong — please try again.</div>
+
+    </form>
+
+    <div class="success" id="success">
+      <div class="big">💌</div>
+      <h2>James has been notified</h2>
+      <p>Thank you for checking in.<br>He'll see this shortly.</p>
+    </div>
+
+  </div>
+
+  <script>
+    let selectedMood = '';
+
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedMood = btn.dataset.mood;
+      });
+    });
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const err = document.getElementById('error-msg');
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      const payload = {
+        mood: selectedMood || 'Not specified',
+        q1: document.getElementById('q1').value.trim(),
+        q2: document.getElementById('q2').value.trim(),
+        q3: document.getElementById('q3').value.trim(),
+      };
+
+      try {
+        const res = await fetch('/api/olivia-submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('form').style.display = 'none';
+          document.getElementById('success').style.display = 'block';
+        } else {
+          throw new Error('server error');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Send to James ✉︎';
+        err.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

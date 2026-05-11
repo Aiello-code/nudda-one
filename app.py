@@ -53,6 +53,47 @@ def property_check():
 def heartstring():
     return render_template("heartstring.html")
 
+@app.route("/olivia")
+def olivia():
+    return render_template("olivia.html")
+
+@app.route("/api/olivia-submit", methods=["POST"])
+def olivia_submit():
+    try:
+        data = request.get_json()
+        mood  = data.get("mood", "Not specified")
+        q1    = data.get("q1", "").strip()
+        q2    = data.get("q2", "").strip()
+        q3    = data.get("q3", "").strip()
+
+        lines = [
+            f"Mood: {mood}",
+            "",
+            f"What's been on her mind:\n{q1 or '(left blank)'}",
+            "",
+            f"Wanted you to know:\n{q2 or '(left blank)'}",
+            "",
+            f"Looking after herself:\n{q3 or '(left blank)'}",
+        ]
+        message = "\n".join(lines)
+
+        topic = os.environ.get("NTFY_TOPIC")
+        if topic:
+            requests.post(
+                f"https://ntfy.sh/{topic}",
+                data=message.encode("utf-8"),
+                headers={
+                    "Title": "Olivia checked in 💌",
+                    "Priority": "high",
+                    "Tags": "heartpulse",
+                },
+                timeout=8,
+            )
+
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
 @app.route("/api/analyze-note", methods=["POST"])
 def analyze_note():
     try:
