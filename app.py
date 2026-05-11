@@ -89,17 +89,20 @@ def olivia_submit():
         data = request.get_json(silent=True) or {}
         availability = data.get("availability", [])
         avail_comment = (data.get("avail_comment") or "").strip()
-        activity = data.get("activity", "Not specified")
+        activity = data.get("activity", [])
+        if isinstance(activity, str):
+            activity = [activity]
         envelope_opened = data.get("envelope_opened", False)
 
         avail_str = ", ".join(availability) if availability else "(none selected)"
+        activity_str = ", ".join(activity) if activity else "(none selected)"
         envelope_str = "Yes — she opened it" if envelope_opened else "No — left it sealed"
 
         lines = [
             f"Availability: {avail_str}",
             f"Clarification: {avail_comment or '(none)'}",
             "",
-            f"Activity: {activity}",
+            f"Activity: {activity_str}",
             "",
             f"Opened the envelope: {envelope_str}",
         ]

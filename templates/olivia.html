@@ -246,6 +246,11 @@
           <div class="opt-icon">🌆</div>
           Wednesday night
         </div>
+        <div class="option" data-value="Thursday night" onclick="toggleAvail(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🌃</div>
+          Thursday night
+        </div>
         <div class="option" data-value="Friday night" onclick="toggleAvail(this)">
           <div class="tick">✓</div>
           <div class="opt-icon">🍸</div>
@@ -276,28 +281,33 @@
     <!-- Activity -->
     <div class="card">
       <div class="card-label">Question 2 of 3</div>
-      <div class="card-question">What would you like to do?</div>
+      <div class="card-question">What would you like to do?<br><span style="font-size:0.85rem;color:#9B7A5A;font-family:Arial,sans-serif">Select all that appeal</span></div>
       <div class="options" id="activity-options">
-        <div class="option" data-value="Try a cuisine you've never had before" onclick="selectActivity(this)">
+        <div class="option" data-value="Try a cuisine you've never had before" onclick="toggleActivity(this)">
           <div class="tick">✓</div>
           <div class="opt-icon">🌏</div>
           Try a cuisine you've never had before
           <span style="display:block;font-size:0.78rem;color:#9B7A5A;font-family:Arial,sans-serif;font-weight:normal;margin-top:3px">(don't worry, I won't order the fish!)</span>
         </div>
-        <div class="option" data-value="James cooks for me" onclick="selectActivity(this)">
+        <div class="option" data-value="James cooks for me" onclick="toggleActivity(this)">
           <div class="tick">✓</div>
           <div class="opt-icon">👨‍🍳</div>
           James cooks for me
         </div>
-        <div class="option" data-value="An outdoor adventure" onclick="selectActivity(this)">
+        <div class="option" data-value="An outdoor adventure" onclick="toggleActivity(this)">
           <div class="tick">✓</div>
           <div class="opt-icon">🥾</div>
           An outdoor adventure
         </div>
-        <div class="option" data-value="Another nice restaurant" onclick="selectActivity(this)">
+        <div class="option" data-value="Another nice restaurant" onclick="toggleActivity(this)">
           <div class="tick">✓</div>
           <div class="opt-icon">🍽️</div>
           Another nice restaurant
+        </div>
+        <div class="option" data-value="A double date" onclick="toggleActivity(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">👫</div>
+          A double date
         </div>
       </div>
     </div>
@@ -337,7 +347,7 @@
 </div>
 <script>
   let availSelected = [];
-  let activitySelected = '';
+  let activitySelected = [];
   let envelopeOpened = false;
 
   function toggleAvail(el) {
@@ -351,10 +361,15 @@
     }
   }
 
-  function selectActivity(el) {
-    document.querySelectorAll('#activity-options .option').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-    activitySelected = el.dataset.value;
+  function toggleActivity(el) {
+    const val = el.dataset.value;
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      activitySelected = activitySelected.filter(v => v !== val);
+    } else {
+      el.classList.add('selected');
+      activitySelected.push(val);
+    }
   }
 
   function openEnvelope() {
@@ -375,8 +390,8 @@
       err.style.display = 'block';
       return;
     }
-    if (!activitySelected) {
-      err.textContent = 'Please pick an activity you\'d like to do.';
+    if (activitySelected.length === 0) {
+      err.textContent = 'Please pick at least one activity you\'d like to do.';
       err.style.display = 'block';
       return;
     }
