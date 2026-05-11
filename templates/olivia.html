@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Olivia's Page</title>
+  <title>For Olivia</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -14,99 +14,118 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
+      padding: 40px 20px 60px;
       color: #2C1A0E;
     }
 
-    .wrap {
-      width: 100%;
-      max-width: 480px;
-    }
+    .wrap { width: 100%; max-width: 500px; }
 
+    /* Header */
     .header {
       text-align: center;
-      margin-bottom: 36px;
+      margin-bottom: 32px;
     }
-
-    .header .heart {
-      font-size: 2.4rem;
-      margin-bottom: 12px;
-    }
-
+    .header .icon { font-size: 2.6rem; margin-bottom: 14px; }
     .header h1 {
-      font-size: 1.7rem;
+      font-size: 1.6rem;
       font-weight: normal;
       color: #2C1A0E;
-      margin-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .header .note {
+      font-size: 0.97rem;
+      color: #6B4C30;
+      line-height: 1.75;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+      text-align: left;
     }
 
-    .header p {
-      font-size: 0.95rem;
-      color: #9B7A5A;
-      line-height: 1.6;
-    }
-
+    /* Cards */
     .card {
       background: #fff;
       border-radius: 18px;
-      padding: 24px;
+      padding: 22px 22px 18px;
       margin-bottom: 16px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 14px rgba(0,0,0,0.06);
     }
-
-    .card label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: #9B7A5A;
-      letter-spacing: 0.5px;
-      margin-bottom: 14px;
+    .card-label {
+      font-size: 0.75rem;
       font-family: Arial, sans-serif;
+      font-weight: 700;
+      color: #9B7A5A;
+      letter-spacing: 0.7px;
       text-transform: uppercase;
-      font-size: 0.78rem;
+      margin-bottom: 14px;
+    }
+    .card-question {
+      font-size: 1rem;
+      color: #2C1A0E;
+      margin-bottom: 16px;
+      line-height: 1.5;
     }
 
-    /* Mood picker */
-    .mood-row {
+    /* Option pills */
+    .options { display: flex; flex-direction: column; gap: 9px; }
+    .option {
       display: flex;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .mood-btn {
-      flex: 1;
-      background: #FDF6EE;
-      border: 2px solid transparent;
-      border-radius: 14px;
-      padding: 10px 4px;
-      font-size: 1.6rem;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1.5px solid #E8D9C8;
+      border-radius: 12px;
       cursor: pointer;
-      text-align: center;
       transition: all 0.15s;
-      position: relative;
+      font-size: 0.95rem;
+      color: #2C1A0E;
+      background: #FDF6EE;
+      user-select: none;
     }
+    .option:hover { border-color: #C96A30; background: #FEF0E4; }
+    .option.selected {
+      border-color: #C96A30;
+      background: #FAEEDA;
+      color: #7A3A10;
+      font-weight: bold;
+    }
+    .option .tick {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #C4A882;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: transparent;
+      transition: all 0.15s;
+    }
+    .option.selected .tick {
+      background: #C96A30;
+      border-color: #C96A30;
+      color: #fff;
+    }
+    .option .opt-icon { font-size: 1.2rem; }
 
-    .mood-btn span {
+    /* Comment textarea */
+    .comment-wrap { margin-top: 12px; }
+    .comment-wrap label {
       display: block;
+      font-size: 0.8rem;
       font-family: Arial, sans-serif;
-      font-size: 0.62rem;
       color: #9B7A5A;
-      margin-top: 4px;
+      margin-bottom: 6px;
     }
-
-    .mood-btn:hover { background: #FAEEDA; }
-    .mood-btn.selected { border-color: #C96A30; background: #FAEEDA; }
-    .mood-btn.selected span { color: #C96A30; font-weight: bold; }
-
-    /* Text areas */
     textarea {
       width: 100%;
       background: #FDF6EE;
       border: 1.5px solid #E8D9C8;
       border-radius: 12px;
-      padding: 13px 15px;
-      font-size: 0.95rem;
+      padding: 11px 14px;
+      font-size: 0.92rem;
       font-family: Georgia, serif;
       color: #2C1A0E;
       resize: none;
@@ -114,9 +133,56 @@
       line-height: 1.6;
       transition: border-color 0.15s;
     }
-
     textarea:focus { border-color: #C96A30; }
     textarea::placeholder { color: #C4A882; }
+
+    /* Secret envelope */
+    .envelope-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .envelope-card .card-label { text-align: left; }
+    .env-teaser {
+      font-size: 0.93rem;
+      color: #9B7A5A;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+    .env-btn {
+      background: #2C1A0E;
+      color: #FDF6EE;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 28px;
+      font-size: 0.95rem;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .env-btn:hover { background: #4A2E18; }
+    .env-contents {
+      display: none;
+      background: #FDF6EE;
+      border: 1.5px solid #E8D9C8;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: left;
+      font-size: 0.95rem;
+      color: #4A2E18;
+      line-height: 1.8;
+      margin-top: 4px;
+    }
+    .env-opened-note {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      font-family: Arial, sans-serif;
+      color: #9B7A5A;
+    }
 
     /* Submit */
     .submit-btn {
@@ -131,22 +197,9 @@
       cursor: pointer;
       margin-top: 8px;
       transition: background 0.15s;
-      letter-spacing: 0.3px;
     }
-
     .submit-btn:hover { background: #B05A24; }
     .submit-btn:disabled { background: #D4A98A; cursor: default; }
-
-    /* Success state */
-    .success {
-      display: none;
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .success .big { font-size: 3rem; margin-bottom: 16px; }
-    .success h2 { font-size: 1.4rem; font-weight: normal; margin-bottom: 10px; }
-    .success p { color: #9B7A5A; font-size: 0.95rem; line-height: 1.6; }
 
     .error-msg {
       color: #C0392B;
@@ -156,116 +209,208 @@
       margin-top: 10px;
       display: none;
     }
+
+    /* Success */
+    .success {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .success .big { font-size: 3rem; margin-bottom: 18px; }
+    .success h2 { font-size: 1.4rem; font-weight: normal; margin-bottom: 10px; }
+    .success p { color: #9B7A5A; font-size: 0.95rem; line-height: 1.7; }
   </style>
 </head>
 <body>
-  <div class="wrap">
+<div class="wrap">
 
-    <div class="header">
-      <div class="heart">🌸</div>
-      <h1>Olivia's Page</h1>
-      <p>A little check-in, just between us.<br>Takes about a minute.</p>
+  <!-- Header note -->
+  <div class="header">
+    <div class="icon">🌹</div>
+    <h1>For Olivia</h1>
+    <div class="note">
+      Thank you so much for coming to Hubert the other night. It is a special restaurant, but then again — you're worth it.<br><br>
+      In that same spirit, I wanted to ask you a few things about what we do next. No pressure at all, just looking forward to more time with you.
     </div>
-
-    <form id="form">
-
-      <div class="card">
-        <label>How are you feeling right now?</label>
-        <div class="mood-row">
-          <button type="button" class="mood-btn" data-mood="Really rough">
-            😔<span>Rough</span>
-          </button>
-          <button type="button" class="mood-btn" data-mood="Not great">
-            😕<span>Not great</span>
-          </button>
-          <button type="button" class="mood-btn" data-mood="Okay">
-            😊<span>Okay</span>
-          </button>
-          <button type="button" class="mood-btn" data-mood="Pretty good">
-            😄<span>Pretty good</span>
-          </button>
-          <button type="button" class="mood-btn" data-mood="Amazing">
-            🤩<span>Amazing</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="card">
-        <label>What's been on your mind lately?</label>
-        <textarea id="q1" rows="3" placeholder="Anything at all — big or small..."></textarea>
-      </div>
-
-      <div class="card">
-        <label>Is there anything you'd like James to know?</label>
-        <textarea id="q2" rows="3" placeholder="Something you've been wanting to say..."></textarea>
-      </div>
-
-      <div class="card">
-        <label>How have you been looking after yourself?</label>
-        <textarea id="q3" rows="2" placeholder="Sleep, food, exercise, rest..."></textarea>
-      </div>
-
-      <button type="submit" class="submit-btn" id="submit-btn">Send to James ✉︎</button>
-      <div class="error-msg" id="error-msg">Something went wrong — please try again.</div>
-
-    </form>
-
-    <div class="success" id="success">
-      <div class="big">💌</div>
-      <h2>James has been notified</h2>
-      <p>Thank you for checking in.<br>He'll see this shortly.</p>
-    </div>
-
   </div>
 
-  <script>
-    let selectedMood = '';
+  <form id="form">
 
-    document.querySelectorAll('.mood-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedMood = btn.dataset.mood;
+    <!-- Availability -->
+    <div class="card">
+      <div class="card-label">Question 1 of 3</div>
+      <div class="card-question">When are you free this week or weekend?<br><span style="font-size:0.85rem;color:#9B7A5A;font-family:Arial,sans-serif">Select all that work for you</span></div>
+      <div class="options" id="avail-options">
+        <div class="option" data-value="Thursday weeknight" onclick="toggleAvail(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🌆</div>
+          Thursday weeknight
+        </div>
+        <div class="option" data-value="Friday weeknight" onclick="toggleAvail(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🍸</div>
+          Friday weeknight
+        </div>
+        <div class="option" data-value="Saturday afternoon" onclick="toggleAvail(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">☀️</div>
+          Saturday afternoon
+        </div>
+        <div class="option" data-value="Sunday afternoon" onclick="toggleAvail(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🌤️</div>
+          Sunday afternoon
+        </div>
+        <div class="option" data-value="Sunday evening" onclick="toggleAvail(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🌙</div>
+          Sunday evening
+        </div>
+      </div>
+      <div class="comment-wrap">
+        <label>Anything to clarify? (optional)</label>
+        <textarea id="avail-comment" rows="2" placeholder="e.g. Friday works but only after 7pm..."></textarea>
+      </div>
+    </div>
+
+    <!-- Activity -->
+    <div class="card">
+      <div class="card-label">Question 2 of 3</div>
+      <div class="card-question">What would you like to do?</div>
+      <div class="options" id="activity-options">
+        <div class="option" data-value="Try a cuisine we've never had before" onclick="selectActivity(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🌏</div>
+          Try a cuisine we've never had before
+        </div>
+        <div class="option" data-value="James cooks for me" onclick="selectActivity(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">👨‍🍳</div>
+          James cooks for me
+        </div>
+        <div class="option" data-value="An outdoor adventure" onclick="selectActivity(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🥾</div>
+          An outdoor adventure
+        </div>
+        <div class="option" data-value="Another nice restaurant" onclick="selectActivity(this)">
+          <div class="tick">✓</div>
+          <div class="opt-icon">🍽️</div>
+          Another nice restaurant
+        </div>
+      </div>
+    </div>
+
+    <!-- Secret envelope -->
+    <div class="envelope-card">
+      <div class="card-label">Question 3 of 3</div>
+      <div class="env-teaser">
+        There's a sealed envelope here with something written just for you.<br>You don't have to open it — entirely up to you.
+      </div>
+      <div id="env-closed">
+        <div style="font-size:2.4rem;margin-bottom:14px">💌</div>
+        <button type="button" class="env-btn" onclick="openEnvelope()">Open the envelope</button>
+        <div style="margin-top:12px;font-size:0.8rem;color:#C4A882;font-family:Arial,sans-serif">or leave it sealed and continue below</div>
+      </div>
+      <div id="env-open" style="display:none">
+        <div class="env-contents" id="env-contents">
+          I want to say thank you for Thursday. I was blown away by how thought-through and wise your thoughts on life were. You're a thoughtful and beautiful person like no one I've met before.<br><br>
+          I don't want to overwhelm you, but I also want to be honest — I would like to date you. I think our personalities are great matches, and our life goals and values are so compatible.<br><br>
+          Whatever you think of that, I will continue to think you're one in a million. 🌹
+        </div>
+        <div class="env-opened-note">✓ Envelope opened</div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">Send my answers →</button>
+    <div class="error-msg" id="error-msg">Something went wrong — please try again.</div>
+
+  </form>
+
+  <div class="success" id="success">
+    <div class="big">🌹</div>
+    <h2>James will see this shortly</h2>
+    <p>Thank you, Olivia.<br>Looking forward to whatever comes next.</p>
+  </div>
+
+</div>
+<script>
+  let availSelected = [];
+  let activitySelected = '';
+  let envelopeOpened = false;
+
+  function toggleAvail(el) {
+    const val = el.dataset.value;
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      availSelected = availSelected.filter(v => v !== val);
+    } else {
+      el.classList.add('selected');
+      availSelected.push(val);
+    }
+  }
+
+  function selectActivity(el) {
+    document.querySelectorAll('#activity-options .option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    activitySelected = el.dataset.value;
+  }
+
+  function openEnvelope() {
+    envelopeOpened = true;
+    document.getElementById('env-closed').style.display = 'none';
+    document.getElementById('env-open').style.display = 'block';
+    document.getElementById('env-contents').style.display = 'block';
+  }
+
+  document.getElementById('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const err = document.getElementById('error-msg');
+    err.style.display = 'none';
+
+    if (availSelected.length === 0) {
+      err.textContent = 'Please select at least one time that works for you.';
+      err.style.display = 'block';
+      return;
+    }
+    if (!activitySelected) {
+      err.textContent = 'Please pick an activity you\'d like to do.';
+      err.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const payload = {
+      availability: availSelected,
+      avail_comment: document.getElementById('avail-comment').value.trim(),
+      activity: activitySelected,
+      envelope_opened: envelopeOpened,
+    };
+
+    try {
+      const res = await fetch('/api/olivia-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-    });
-
-    document.getElementById('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      const err = document.getElementById('error-msg');
-      err.style.display = 'none';
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-
-      const payload = {
-        mood: selectedMood || 'Not specified',
-        q1: document.getElementById('q1').value.trim(),
-        q2: document.getElementById('q2').value.trim(),
-        q3: document.getElementById('q3').value.trim(),
-      };
-
-      try {
-        const res = await fetch('/api/olivia-submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        console.log('Submit response:', JSON.stringify(data));
-        if (data.ok) {
-          document.getElementById('form').style.display = 'none';
-          document.getElementById('success').style.display = 'block';
-        } else {
-          throw new Error(data.error || 'server error');
-        }
-      } catch (e) {
-        console.error('Submit error:', e);
-        btn.disabled = false;
-        btn.textContent = 'Send to James \u2709\ufe0e';
-        err.textContent = 'Something went wrong: ' + e.message;
-        err.style.display = 'block';
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById('form').style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        throw new Error(data.error || 'server error');
       }
-    });
-  </script>
+    } catch (ex) {
+      btn.disabled = false;
+      btn.textContent = 'Send my answers \u2192';
+      err.textContent = 'Something went wrong \u2014 please try again.';
+      err.style.display = 'block';
+    }
+  });
+</script>
 </body>
 </html>

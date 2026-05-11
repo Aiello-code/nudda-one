@@ -87,19 +87,21 @@ def test_ntfy():
 def olivia_submit():
     try:
         data = request.get_json(silent=True) or {}
-        mood = data.get("mood", "Not specified")
-        q1   = (data.get("q1") or "").strip()
-        q2   = (data.get("q2") or "").strip()
-        q3   = (data.get("q3") or "").strip()
+        availability = data.get("availability", [])
+        avail_comment = (data.get("avail_comment") or "").strip()
+        activity = data.get("activity", "Not specified")
+        envelope_opened = data.get("envelope_opened", False)
+
+        avail_str = ", ".join(availability) if availability else "(none selected)"
+        envelope_str = "Yes — she opened it" if envelope_opened else "No — left it sealed"
 
         lines = [
-            f"Mood: {mood}",
+            f"Availability: {avail_str}",
+            f"Clarification: {avail_comment or '(none)'}",
             "",
-            f"What's been on her mind:\n{q1 or '(left blank)'}",
+            f"Activity: {activity}",
             "",
-            f"Wanted you to know:\n{q2 or '(left blank)'}",
-            "",
-            f"Looking after herself:\n{q3 or '(left blank)'}",
+            f"Opened the envelope: {envelope_str}",
         ]
         message = "\n".join(lines)
 
@@ -112,9 +114,9 @@ def olivia_submit():
                     f"https://ntfy.sh/{topic}",
                     data=message.encode("utf-8"),
                     headers={
-                        "Title": "Olivia checked in",
+                        "Title": "Olivia replied",
                         "Priority": "high",
-                        "Tags": "heartpulse",
+                        "Tags": "rose",
                     },
                     timeout=8,
                 )
