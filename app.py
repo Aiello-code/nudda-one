@@ -57,6 +57,32 @@ def heartstring():
 def olivia():
     return render_template("olivia.html")
 
+@app.route("/api/test-ntfy")
+def test_ntfy():
+    """Diagnostic endpoint — shows exactly what ntfy returns."""
+    topic = os.environ.get("NTFY_TOPIC")
+    if not topic:
+        return jsonify({"error": "NTFY_TOPIC env var not set"})
+    try:
+        r = requests.post(
+            f"https://ntfy.sh/{topic}",
+            data=b"Test notification from jamespelosi.com",
+            headers={
+                "Title": "Test notification",
+                "Priority": "high",
+                "Tags": "white_check_mark",
+            },
+            timeout=10,
+        )
+        return jsonify({
+            "topic": topic,
+            "ntfy_url": f"https://ntfy.sh/{topic}",
+            "status_code": r.status_code,
+            "response": r.text[:500],
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
 @app.route("/api/olivia-submit", methods=["POST"])
 def olivia_submit():
     try:
