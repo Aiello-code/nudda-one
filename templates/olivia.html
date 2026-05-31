@@ -14,435 +14,258 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px 60px;
+      padding: 50px 20px 70px;
       color: #2C1A0E;
     }
 
-    .wrap { width: 100%; max-width: 500px; }
+    h1 {
+      font-size: 2rem;
+      color: #8B4513;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.02em;
+    }
 
-    /* Header */
-    .header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-    .header .icon { font-size: 2.6rem; margin-bottom: 14px; }
-    .header h1 {
-      font-size: 1.6rem;
-      font-weight: normal;
-      color: #2C1A0E;
-      margin-bottom: 16px;
-    }
-    .header .note {
-      font-size: 0.97rem;
-      color: #6B4C30;
-      line-height: 1.75;
+    .note {
       background: #fff;
-      border-radius: 16px;
-      padding: 20px 22px;
-      box-shadow: 0 2px 14px rgba(0,0,0,0.06);
-      text-align: left;
+      border: 1px solid #e8d5c4;
+      border-radius: 14px;
+      padding: 1.8rem 2.2rem;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 2px 14px rgba(139,69,19,0.08);
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: #4a2e1a;
+      margin-bottom: 2.5rem;
     }
 
-    /* Cards */
-    .card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 22px 22px 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 14px rgba(0,0,0,0.06);
-    }
-    .card-label {
-      font-size: 0.75rem;
-      font-family: Arial, sans-serif;
-      font-weight: 700;
-      color: #9B7A5A;
-      letter-spacing: 0.7px;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    .card-question {
-      font-size: 1rem;
-      color: #2C1A0E;
-      margin-bottom: 16px;
-      line-height: 1.5;
-    }
+    .note p + p { margin-top: 0.8rem; }
 
-    /* Option pills */
-    .options { display: flex; flex-direction: column; gap: 9px; }
-    .option {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border: 1.5px solid #E8D9C8;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
+    .wheel-hint {
+      font-style: italic;
+      color: #8B4513;
+      margin-bottom: 1.2rem;
       font-size: 0.95rem;
-      color: #2C1A0E;
-      background: #FDF6EE;
-      user-select: none;
     }
-    .option:hover { border-color: #C96A30; background: #FEF0E4; }
-    .option.selected {
-      border-color: #C96A30;
-      background: #FAEEDA;
-      color: #7A3A10;
-      font-weight: bold;
+
+    .wheel-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 1.4rem;
     }
-    .option .tick {
-      width: 20px;
-      height: 20px;
+
+    .pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 11px solid transparent;
+      border-right: 11px solid transparent;
+      border-top: 24px solid #8B4513;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+      z-index: 5;
+    }
+
+    #wheel {
+      display: block;
       border-radius: 50%;
-      border: 1.5px solid #C4A882;
-      flex-shrink: 0;
+      box-shadow: 0 4px 22px rgba(139,69,19,0.22);
+      cursor: pointer;
+    }
+
+    .spin-btn {
+      display: inline-block;
+      background: #8B4513;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 0.75rem 2.8rem;
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.18s;
+      margin-bottom: 1.5rem;
+    }
+
+    .spin-btn:hover:not(:disabled) { background: #6b3010; }
+    .spin-btn:disabled { background: #c9a98a; cursor: default; }
+
+    .result {
+      min-height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
-      color: transparent;
-      transition: all 0.15s;
     }
-    .option.selected .tick {
-      background: #C96A30;
-      border-color: #C96A30;
-      color: #fff;
-    }
-    .option .opt-icon { font-size: 1.2rem; }
 
-    /* Comment textarea */
-    .comment-wrap { margin-top: 12px; }
-    .comment-wrap label {
-      display: block;
-      font-size: 0.8rem;
-      font-family: Arial, sans-serif;
-      color: #9B7A5A;
-      margin-bottom: 6px;
-    }
-    textarea {
-      width: 100%;
-      background: #FDF6EE;
-      border: 1.5px solid #E8D9C8;
-      border-radius: 12px;
-      padding: 11px 14px;
-      font-size: 0.92rem;
-      font-family: Georgia, serif;
-      color: #2C1A0E;
-      resize: none;
-      outline: none;
-      line-height: 1.6;
-      transition: border-color 0.15s;
-    }
-    textarea:focus { border-color: #C96A30; }
-    textarea::placeholder { color: #C4A882; }
-
-    /* Secret envelope */
-    .envelope-card {
+    .result-pill {
+      border: 2px solid #8B4513;
+      border-radius: 50px;
+      padding: 0.6rem 2.2rem;
+      font-size: 1.15rem;
+      color: #8B4513;
+      font-style: italic;
       background: #fff;
-      border-radius: 18px;
-      padding: 22px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 14px rgba(0,0,0,0.06);
-      text-align: center;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
-    .envelope-card .card-label { text-align: left; }
-    .env-teaser {
-      font-size: 0.93rem;
-      color: #9B7A5A;
-      margin-bottom: 18px;
-      line-height: 1.6;
+
+    .result-pill.show {
+      opacity: 1;
+      transform: translateY(0);
     }
-    .env-btn {
-      background: #2C1A0E;
-      color: #FDF6EE;
-      border: none;
-      border-radius: 12px;
-      padding: 13px 28px;
+
+    .sig {
+      margin-top: 2.5rem;
+      color: #9a7060;
+      font-style: italic;
       font-size: 0.95rem;
-      font-family: Georgia, serif;
-      cursor: pointer;
-      transition: background 0.15s;
-      letter-spacing: 0.3px;
     }
-    .env-btn:hover { background: #4A2E18; }
-    .env-contents {
-      display: none;
-      background: #FDF6EE;
-      border: 1.5px solid #E8D9C8;
-      border-radius: 14px;
-      padding: 20px;
-      text-align: left;
-      font-size: 0.95rem;
-      color: #4A2E18;
-      line-height: 1.8;
-      margin-top: 4px;
-    }
-    .env-opened-note {
-      margin-top: 12px;
-      font-size: 0.8rem;
-      font-family: Arial, sans-serif;
-      color: #9B7A5A;
-    }
-
-    /* Submit */
-    .submit-btn {
-      width: 100%;
-      background: #C96A30;
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 16px;
-      font-size: 1rem;
-      font-family: Georgia, serif;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.15s;
-    }
-    .submit-btn:hover { background: #B05A24; }
-    .submit-btn:disabled { background: #D4A98A; cursor: default; }
-
-    .error-msg {
-      color: #C0392B;
-      font-size: 0.85rem;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 10px;
-      display: none;
-    }
-
-    /* Success */
-    .success {
-      display: none;
-      text-align: center;
-      padding: 60px 20px;
-    }
-    .success .big { font-size: 3rem; margin-bottom: 18px; }
-    .success h2 { font-size: 1.4rem; font-weight: normal; margin-bottom: 10px; }
-    .success p { color: #9B7A5A; font-size: 0.95rem; line-height: 1.7; }
   </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- Header note -->
-  <div class="header">
-    <div class="icon">🌹</div>
-    <h1>For Olivia</h1>
-    <div class="note">
-      Thank you so much for coming to Hubert the other night. It is a special restaurant, but then again — you're a special person.<br><br>
-      I wanted to ask you a few things about what we do next. No pressure at all, just looking forward to more time with you.
-    </div>
+  <h1>🌸 For Olivia</h1>
+
+  <div class="note">
+    <p>I have really enjoyed getting to know you, and I think you are a truly wonderful person.</p>
+    <p>There are so many things I admire about you — give the wheel a spin to discover them one by one.</p>
   </div>
 
-  <form id="form">
+  <p class="wheel-hint">Click the wheel or the button to spin</p>
 
-    <!-- Availability -->
-    <div class="card">
-      <div class="card-label">Question 1 of 3</div>
-      <div class="card-question">When are you free this week or weekend?<br><span style="font-size:0.85rem;color:#9B7A5A;font-family:Arial,sans-serif">Select all that work for you</span></div>
-      <div class="options" id="avail-options">
-        <div class="option" data-value="Wednesday night" onclick="toggleAvail(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🌆</div>
-          Wednesday night
-        </div>
-        <div class="option" data-value="Thursday night" onclick="toggleAvail(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🌃</div>
-          Thursday night
-        </div>
-        <div class="option" data-value="Friday night" onclick="toggleAvail(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🍸</div>
-          Friday night
-        </div>
-        <div class="option" data-value="Saturday afternoon" onclick="toggleAvail(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">☀️</div>
-          Saturday afternoon
-        </div>
-        <div class="option" data-value="Sunday afternoon" onclick="toggleAvail(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🌤️</div>
-          Sunday afternoon
-        </div>
-        <div class="option" data-value="Sunday evening" onclick="toggleAvail(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🌙</div>
-          Sunday evening
-        </div>
-        <div class="option" data-value="Sorry those don't work but another time does" onclick="toggleAvail(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">📅</div>
-          Sorry those don't work but another time does
-        </div>
-      </div>
-      <div class="comment-wrap">
-        <label>Anything to clarify? (optional)</label>
-        <textarea id="avail-comment" rows="2" placeholder="e.g. Friday works but only after 7pm..."></textarea>
-      </div>
-    </div>
-
-    <!-- Activity -->
-    <div class="card">
-      <div class="card-label">Question 2 of 3</div>
-      <div class="card-question">What would you like to do?<br><span style="font-size:0.85rem;color:#9B7A5A;font-family:Arial,sans-serif">Select all that appeal</span><br><span style="font-size:0.82rem;color:#B08A6A;font-family:Arial,sans-serif;font-style:italic">All options include transportation to and from the location</span></div>
-      <div class="options" id="activity-options">
-        <div class="option" data-value="Try a cuisine you've never had before" onclick="toggleActivity(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🌏</div>
-          Try a cuisine you've never had before
-          <span style="display:block;font-size:0.78rem;color:#9B7A5A;font-family:Arial,sans-serif;font-weight:normal;margin-top:3px">(don't worry, I won't order the fish!)</span>
-        </div>
-        <div class="option" data-value="James cooks for me" onclick="toggleActivity(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">👨‍🍳</div>
-          James cooks for me
-        </div>
-        <div class="option" data-value="An outdoor adventure" onclick="toggleActivity(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🥾</div>
-          An outdoor adventure
-        </div>
-        <div class="option" data-value="Another nice restaurant" onclick="toggleActivity(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🍽️</div>
-          Another nice restaurant
-        </div>
-        <div class="option" data-value="A double date" onclick="toggleActivity(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">👫</div>
-          A double date
-        </div>
-        <div class="option" data-value="Cosy night in" onclick="toggleActivity(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🛋️</div>
-          Cosy night in
-        </div>
-        <div class="option" data-value="Movie / arcade at the cinema" onclick="toggleActivity(this)">
-          <div class="tick">✓</div>
-          <div class="opt-icon">🎬</div>
-          Movie / arcade at the cinema
-        </div>
-      </div>
-    </div>
-
-    <!-- Secret envelope -->
-    <div class="envelope-card">
-      <div class="card-label">Question 3 of 3</div>
-      <div class="env-teaser">
-        There's a sealed envelope here with something written just for you.<br>You don't have to open it — entirely up to you.
-      </div>
-      <div id="env-closed">
-        <div style="font-size:2.4rem;margin-bottom:14px">💌</div>
-        <button type="button" class="env-btn" onclick="openEnvelope()">Open the envelope</button>
-        <div style="margin-top:12px;font-size:0.8rem;color:#C4A882;font-family:Arial,sans-serif">or leave it sealed and continue below</div>
-      </div>
-      <div id="env-open" style="display:none">
-        <div class="env-contents" id="env-contents">
-          I want to say thank you for Wednesday. I was blown away by how thought-through and wise your thoughts on life were. You're a thoughtful and beautiful person like no one I've met before.<br><br>
-          I don't want to overwhelm you, but I also want to be honest — I would like to date you. I think our personalities are great matches, as are our life goals and values.<br><br>
-          Whatever you think of that, I will continue to think you're one in a million. 🌹<br><br>
-          P.s. I got you a second gift from Japan (it wasn't ready last week). I think it will go well with the other one on your desk.
-        </div>
-        <div class="env-opened-note">✓ Envelope opened</div>
-      </div>
-    </div>
-
-    <button type="submit" class="submit-btn" id="submit-btn">Send my answers →</button>
-    <div class="error-msg" id="error-msg">Something went wrong — please try again.</div>
-
-  </form>
-
-  <div class="success" id="success">
-    <div class="big">🌹</div>
-    <h2>James will see this shortly</h2>
-    <p>Thank you, Olivia.<br>Looking forward to whatever comes next.</p>
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="380" height="380" onclick="spin()"></canvas>
   </div>
 
-</div>
-<script>
-  let availSelected = [];
-  let activitySelected = [];
-  let envelopeOpened = false;
+  <button class="spin-btn" id="spinBtn" onclick="spin()">Spin</button>
 
-  function toggleAvail(el) {
-    const val = el.dataset.value;
-    if (el.classList.contains('selected')) {
-      el.classList.remove('selected');
-      availSelected = availSelected.filter(v => v !== val);
-    } else {
-      el.classList.add('selected');
-      availSelected.push(val);
-    }
-  }
+  <div class="result">
+    <span class="result-pill" id="pill"></span>
+  </div>
 
-  function toggleActivity(el) {
-    const val = el.dataset.value;
-    if (el.classList.contains('selected')) {
-      el.classList.remove('selected');
-      activitySelected = activitySelected.filter(v => v !== val);
-    } else {
-      el.classList.add('selected');
-      activitySelected.push(val);
-    }
-  }
+  <div class="sig">— James</div>
 
-  function openEnvelope() {
-    envelopeOpened = true;
-    document.getElementById('env-closed').style.display = 'none';
-    document.getElementById('env-open').style.display = 'block';
-    document.getElementById('env-contents').style.display = 'block';
-  }
+  <script>
+    const ATTRS = [
+      'Smart', 'Beautiful', 'Friendly', 'Athletic', 'Cultured',
+      'Sense of Humour', 'Loves Poetry', 'Honest', 'Open Minded',
+      'Ambitious', 'Thoughtful', 'Faith-Driven', 'Family Orientated',
+      'Knowledgeable', 'Kind'
+    ];
 
-  document.getElementById('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    const err = document.getElementById('error-msg');
-    err.style.display = 'none';
+    const PALETTE = ['#8B4513','#C8733A','#A05828'];
+    const N = ATTRS.length;
+    const ARC = (2 * Math.PI) / N;
 
-    if (availSelected.length === 0) {
-      err.textContent = 'Please select at least one time that works for you.';
-      err.style.display = 'block';
-      return;
-    }
-    if (activitySelected.length === 0) {
-      err.textContent = 'Please pick at least one activity you\'d like to do.';
-      err.style.display = 'block';
-      return;
-    }
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const CX = canvas.width / 2;
+    const CY = canvas.height / 2;
+    const R = CX - 4;
 
-    btn.disabled = true;
-    btn.textContent = 'Sending...';
+    let rot = 0;
+    let spinning = false;
 
-    const payload = {
-      availability: availSelected,
-      avail_comment: document.getElementById('avail-comment').value.trim(),
-      activity: activitySelected,
-      envelope_opened: envelopeOpened,
-    };
+    function draw(r) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    try {
-      const res = await fetch('/api/olivia-submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById('form').style.display = 'none';
-        document.getElementById('success').style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        throw new Error(data.error || 'server error');
+      for (let i = 0; i < N; i++) {
+        const a0 = r + i * ARC;
+        const a1 = a0 + ARC;
+
+        ctx.beginPath();
+        ctx.moveTo(CX, CY);
+        ctx.arc(CX, CY, R, a0, a1);
+        ctx.closePath();
+        ctx.fillStyle = PALETTE[i % PALETTE.length];
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(253,246,238,0.55)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(CX, CY);
+        ctx.rotate(a0 + ARC / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'rgba(255,255,255,0.94)';
+
+        const label = ATTRS[i];
+        const maxW = R - 28;
+        let fontSize = 11;
+        ctx.font = `bold ${fontSize}px Georgia, serif`;
+        while (ctx.measureText(label).width > maxW && fontSize > 7) {
+          fontSize--;
+          ctx.font = `bold ${fontSize}px Georgia, serif`;
+        }
+
+        ctx.shadowColor = 'rgba(0,0,0,0.45)';
+        ctx.shadowBlur = 3;
+        ctx.fillText(label, R - 12, 4);
+        ctx.restore();
       }
-    } catch (ex) {
-      btn.disabled = false;
-      btn.textContent = 'Send my answers \u2192';
-      err.textContent = 'Something went wrong \u2014 please try again.';
-      err.style.display = 'block';
+
+      // hub
+      ctx.beginPath();
+      ctx.arc(CX, CY, 22, 0, 2 * Math.PI);
+      ctx.fillStyle = '#FDF6EE';
+      ctx.fill();
+      ctx.strokeStyle = '#8B4513';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#8B4513';
+      ctx.font = '15px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('♡', CX, CY + 1);
     }
-  });
-</script>
+
+    function spin() {
+      if (spinning) return;
+      spinning = true;
+
+      const btn = document.getElementById('spinBtn');
+      const pill = document.getElementById('pill');
+      btn.disabled = true;
+      pill.classList.remove('show');
+
+      const target = Math.floor(Math.random() * N);
+
+      // angle that puts the centre of segment `target` at the top pointer (-π/2)
+      const baseAngle = -Math.PI / 2 - target * ARC - ARC / 2;
+      const minFinal = rot + 6 * 2 * Math.PI;
+      const k = Math.ceil((minFinal - baseAngle) / (2 * Math.PI));
+      const finalRot = baseAngle + 2 * Math.PI * k;
+
+      const duration = 4400;
+      const t0 = performance.now();
+      const r0 = rot;
+
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3.8); }
+
+      function frame(now) {
+        const t = Math.min((now - t0) / duration, 1);
+        rot = r0 + (finalRot - r0) * easeOut(t);
+        draw(rot);
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          rot = finalRot;
+          spinning = false;
+          btn.disabled = false;
+          pill.textContent = ATTRS[target];
+          pill.classList.add('show');
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    draw(rot);
+  </script>
+
 </body>
 </html>
