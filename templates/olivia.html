@@ -259,10 +259,45 @@
           btn.disabled = false;
           pill.textContent = ATTRS[target];
           pill.classList.add('show');
+          rainWords(ATTRS[target]);
         }
       }
 
       requestAnimationFrame(frame);
+    }
+
+    function rainWords(word) {
+      const count = 22;
+      const drops = [];
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('span');
+        el.textContent = word;
+        el.style.cssText = `
+          position: fixed;
+          top: -2rem;
+          left: ${5 + Math.random() * 90}vw;
+          font-family: Georgia, serif;
+          font-size: ${0.85 + Math.random() * 0.7}rem;
+          color: #8B4513;
+          opacity: ${0.55 + Math.random() * 0.45};
+          pointer-events: none;
+          white-space: nowrap;
+          z-index: 999;
+          font-style: italic;
+        `;
+        document.body.appendChild(el);
+
+        const delay = Math.random() * 1800;
+        const dur = 1800 + Math.random() * 1400;
+        const swing = (Math.random() - 0.5) * 80;
+
+        el.animate([
+          { transform: `translateY(0) translateX(0) rotate(${(Math.random()-0.5)*25}deg)`, opacity: el.style.opacity },
+          { transform: `translateY(110vh) translateX(${swing}px) rotate(${(Math.random()-0.5)*25}deg)`, opacity: 0 }
+        ], { delay, duration: dur, easing: 'ease-in', fill: 'forwards' })
+          .finished.then(() => el.remove());
+      }
     }
 
     draw(rot);
