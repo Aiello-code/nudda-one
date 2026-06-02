@@ -116,6 +116,69 @@
       transform: translateY(0);
     }
 
+    .see-all-btn {
+      display: none;
+      margin: 1.2rem auto 0;
+      background: transparent;
+      color: #8B4513;
+      border: 2px solid #8B4513;
+      border-radius: 50px;
+      padding: 0.65rem 2.2rem;
+      font-family: Georgia, serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+
+    .see-all-btn:hover { background: #8B4513; color: #fff; }
+
+    .see-all-btn.visible { display: inline-block; }
+
+    .all-attrs {
+      display: none;
+      max-width: 520px;
+      width: 100%;
+      background: #fff;
+      border: 1px solid #e8d5c4;
+      border-radius: 14px;
+      padding: 1.6rem 2rem;
+      margin-top: 1.4rem;
+      box-shadow: 0 2px 14px rgba(139,69,19,0.08);
+      text-align: left;
+    }
+
+    .all-attrs.visible { display: block; }
+
+    .all-attrs h3 {
+      font-size: 1rem;
+      color: #8B4513;
+      margin-bottom: 1rem;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .all-attrs ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem 1.2rem;
+    }
+
+    .all-attrs li {
+      font-size: 0.95rem;
+      color: #4a2e1a;
+      padding-left: 1.1rem;
+      position: relative;
+    }
+
+    .all-attrs li::before {
+      content: '🌹';
+      position: absolute;
+      left: -0.3rem;
+      font-size: 0.75rem;
+      top: 0.1rem;
+    }
+
     .sig {
       margin-top: 2.5rem;
       color: #9a7060;
@@ -146,6 +209,13 @@
     <span class="result-pill" id="pill"></span>
   </div>
 
+  <button class="see-all-btn" id="seeAllBtn" onclick="toggleAll()">See all</button>
+
+  <div class="all-attrs" id="allAttrs">
+    <h3>Everything I admire about you</h3>
+    <ul id="attrList"></ul>
+  </div>
+
   <div class="sig">— James</div>
 
   <script>
@@ -169,6 +239,22 @@
 
     let rot = 0;
     let spinning = false;
+    let spinCount = 0;
+
+    // Populate the "See all" list once
+    const attrList = document.getElementById('attrList');
+    ATTRS.forEach(a => {
+      const li = document.createElement('li');
+      li.textContent = a;
+      attrList.appendChild(li);
+    });
+
+    function toggleAll() {
+      const box = document.getElementById('allAttrs');
+      const btn = document.getElementById('seeAllBtn');
+      const showing = box.classList.toggle('visible');
+      btn.textContent = showing ? 'Hide' : 'See all';
+    }
 
     function draw(r) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -260,6 +346,10 @@
           pill.textContent = ATTRS[target];
           pill.classList.add('show');
           rainWords(ATTRS[target]);
+          spinCount++;
+          if (spinCount >= 3) {
+            document.getElementById('seeAllBtn').classList.add('visible');
+          }
         }
       }
 
