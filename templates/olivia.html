@@ -267,18 +267,19 @@
     }
 
     function rainWords(word) {
-      const count = 22;
-      const drops = [];
+      const items = [];
+      for (let i = 0; i < 22; i++) items.push({ text: word, isRose: false });
+      for (let i = 0; i < 18; i++) items.push({ text: '🌹', isRose: true });
 
-      for (let i = 0; i < count; i++) {
+      items.forEach(({ text, isRose }) => {
         const el = document.createElement('span');
-        el.textContent = word;
+        el.textContent = text;
         el.style.cssText = `
           position: fixed;
-          top: -2rem;
-          left: ${5 + Math.random() * 90}vw;
+          top: -2.5rem;
+          left: ${3 + Math.random() * 94}vw;
           font-family: Georgia, serif;
-          font-size: ${0.85 + Math.random() * 0.7}rem;
+          font-size: ${isRose ? 1.1 + Math.random() * 0.9 : 0.85 + Math.random() * 0.7}rem;
           color: #8B4513;
           opacity: ${0.55 + Math.random() * 0.45};
           pointer-events: none;
@@ -288,16 +289,18 @@
         `;
         document.body.appendChild(el);
 
-        const delay = Math.random() * 1800;
-        const dur = 1800 + Math.random() * 1400;
+        const delay = Math.random() * 2200;
+        const dur = 1800 + Math.random() * 1600;
         const swing = (Math.random() - 0.5) * 80;
+        const rot0 = (Math.random() - 0.5) * 30;
+        const rot1 = (Math.random() - 0.5) * 30;
 
         el.animate([
-          { transform: `translateY(0) translateX(0) rotate(${(Math.random()-0.5)*25}deg)`, opacity: el.style.opacity },
-          { transform: `translateY(110vh) translateX(${swing}px) rotate(${(Math.random()-0.5)*25}deg)`, opacity: 0 }
+          { transform: `translateY(0) translateX(0) rotate(${rot0}deg)`, opacity: el.style.opacity },
+          { transform: `translateY(110vh) translateX(${swing}px) rotate(${rot1}deg)`, opacity: 0 }
         ], { delay, duration: dur, easing: 'ease-in', fill: 'forwards' })
           .finished.then(() => el.remove());
-      }
+      });
     }
 
     draw(rot);
